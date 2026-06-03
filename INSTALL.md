@@ -52,12 +52,24 @@ Copy-Item -Recurse outputs\portable-agent-kit\codex-skills\* "$HOME\.codex\skill
 
 Then start a new Codex session so the skills are discoverable.
 
-## Add A New Agent
+## Add Or Edit An Agent
 
-1. Add it to `specs/agents.yaml`.
-2. Create one `claude-agents/<name>.md` file with the same `name`, `description`, tool list, and prompt body.
-3. Create one `codex-skills/<name>/SKILL.md` with the same behavior as Codex skill instructions.
-4. Keep the `description` explicit because both systems use it to decide when to invoke the agent or skill.
+The Claude and Codex files are generated. Edit the spec, never the generated files.
+
+1. Edit `specs/agents.yaml` (add an agent or change `description`, `role`, `sections`, or `tools`).
+2. Regenerate both platform outputs:
+
+   ```powershell
+   python scripts\generate-agent-kit.py
+   ```
+
+3. Validate (checks frontmatter and cross-platform description parity):
+
+   ```powershell
+   powershell -File scripts\validate-agent-kit.ps1
+   ```
+
+Keep each `description` explicit and platform-neutral, because both systems use it to decide when to invoke the agent or skill. Avoid platform-specific wording such as "when Codex is asked to ..." so routing stays uniform.
 
 ## Name The Characters
 

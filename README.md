@@ -14,10 +14,26 @@ It includes a lean startup-style agent team with:
 
 - `specs/agents.yaml`: canonical source of truth.
 - `specs/token-efficiency.md`: shared context and token budget protocol.
-- `claude-agents/*.md`: Claude Code subagents.
-- `codex-skills/*/SKILL.md`: Codex skills.
-- `scripts/validate-agent-kit.ps1`: basic local validation.
+- `claude-agents/*.md`: Claude Code subagents (generated).
+- `codex-skills/*/SKILL.md`: Codex skills (generated).
+- `scripts/generate-agent-kit.py`: generates both platform outputs from `specs/agents.yaml`.
+- `scripts/validate-agent-kit.ps1`: local validation, including cross-platform description parity.
 - `INSTALL.md`: installation instructions.
+
+## Uniform Claude + Codex
+
+Both platforms are generated from one spec so each specialist behaves identically:
+
+- Same `description` (so routing triggers the same agent on both platforms).
+- Same body: identity, role, and structured sections.
+- Only the frontmatter differs, because each platform requires a different shape (Claude declares `tools`/`model`; Codex adds an H1 title).
+
+Do not edit the generated files by hand. Edit `specs/agents.yaml`, then run:
+
+```powershell
+python scripts\generate-agent-kit.py
+powershell -File scripts\validate-agent-kit.ps1
+```
 
 ## Core Team
 
