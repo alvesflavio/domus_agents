@@ -21,7 +21,7 @@ version: 2
 
 defaults:
   model: inherit
-  specialist_name: Claude
+  specialist_name: TODO
   language_note: "Respond in the user's language unless the user asks otherwise."
 
 agents:
