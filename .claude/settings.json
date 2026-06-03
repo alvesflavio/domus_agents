@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "file-modified": [
+      {
+        "pattern": "specs/agents.yaml",
+        "description": "Agents spec changed — regenerate and deploy to Claude + Codex",
+        "commands": [
+          "python scripts/generate-agent-kit.py",
+          "powershell -File scripts/validate-agent-kit.ps1",
+          "powershell -File scripts/deploy-agents.ps1"
+        ]
+      }
+    ]
+  }
+}

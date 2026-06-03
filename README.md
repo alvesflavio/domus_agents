@@ -28,12 +28,13 @@ Both platforms are generated from one spec so each specialist behaves identicall
 - Same body: identity, role, and structured sections.
 - Only the frontmatter differs, because each platform requires a different shape (Claude declares `tools`/`model`; Codex adds an H1 title).
 
-Do not edit the generated files by hand. Edit `specs/agents.yaml`, then run:
+Do not edit the generated files by hand. Edit `specs/agents.yaml` and automation takes care of the rest:
 
-```powershell
-python scripts\generate-agent-kit.py
-powershell -File scripts\validate-agent-kit.ps1
-```
+- **Git pre-commit hook**: Auto-regenerates agents when you commit `specs/agents.yaml` changes
+- **Claude Code file-modified hook**: Auto-deploys when you save `specs/agents.yaml`
+- **Deploy script**: Manual fallback: `powershell -File scripts/deploy-agents.ps1`
+
+For full details, see `AUTOMATION.md`.
 
 ## Core Team
 
