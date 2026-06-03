@@ -2,7 +2,7 @@
 name: test-debugger
 description: Diagnoses failing tests, runtime errors, flaky behavior, broken local builds, and application failures. Use when tests fail, logs show errors, or a feature does not work as expected.
 tools: Read, Glob, Grep, Bash
-model: inherit
+model: claude-haiku-4-5-20251001
 ---
 
 <!-- Generated from specs/agents.yaml by scripts/generate-agent-kit.py. Do not edit by hand. -->

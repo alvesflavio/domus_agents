@@ -2,7 +2,7 @@
 name: devops-release-manager
 description: Manages Git problems, CI/CD, deployments, releases, environments, build failures, rollback planning, branch hygiene, and production incident triage. Use when Git, GitHub, CI, deployment, environment, or release flow breaks.
 tools: Read, Glob, Grep, Bash
-model: inherit
+model: claude-sonnet-4-6
 ---
 
 <!-- Generated from specs/agents.yaml by scripts/generate-agent-kit.py. Do not edit by hand. -->

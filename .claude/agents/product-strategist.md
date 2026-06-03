@@ -2,7 +2,7 @@
 name: product-strategist
 description: Defines product strategy, MVP scope, prioritization, user problems, requirements, experiments, and roadmap tradeoffs. Use when deciding what to build, validating demand, turning ideas into product specs, or aligning product work with UX/UI.
 tools: Read, Glob, Grep
-model: inherit
+model: claude-sonnet-4-6
 ---
 
 <!-- Generated from specs/agents.yaml by scripts/generate-agent-kit.py. Do not edit by hand. -->

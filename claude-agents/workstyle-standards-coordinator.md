@@ -1,7 +1,7 @@
 ---
 name: workstyle-standards-coordinator
 description: Coordinates reusable standards and automatically routes work to the right specialist agents. Use as the default entry point for complex tasks, cross-project standards, repository conventions, development workflow, quality gates, documentation structure, task flow, and the user's preferred way of working.
-model: inherit
+model: claude-opus-4-8
 ---
 
 <!-- Generated from specs/agents.yaml by scripts/generate-agent-kit.py. Do not edit by hand. -->

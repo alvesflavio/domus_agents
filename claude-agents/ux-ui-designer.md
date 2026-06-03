@@ -2,7 +2,7 @@
 name: ux-ui-designer
 description: Designs and reviews user flows, UI structure, interaction patterns, accessibility, visual hierarchy, and frontend ergonomics. Use for product screens, dashboards, forms, navigation, design critique, and UI implementation guidance.
 tools: Read, Glob, Grep, Bash
-model: inherit
+model: claude-sonnet-4-6
 ---
 
 <!-- Generated from specs/agents.yaml by scripts/generate-agent-kit.py. Do not edit by hand. -->

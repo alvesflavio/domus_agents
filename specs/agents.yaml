@@ -20,14 +20,20 @@
 version: 2
 
 defaults:
-  model: inherit
+  model: claude-sonnet-4-6
   specialist_name: TODO
   language_note: "Respond in the user's language unless the user asks otherwise."
+
+# Model Strategy:
+#   - claude-opus-4-8: Strategic decisions (architecture, planning, coordination)
+#   - claude-sonnet-4-6: General purpose (default for most agents)
+#   - claude-haiku-4-5: Fast/simple tasks (copy, debugging help)
 
 agents:
   - name: workstyle-standards-coordinator
     display_name: Workstyle Standards Coordinator
     description: "Coordinates reusable standards and automatically routes work to the right specialist agents. Use as the default entry point for complex tasks, cross-project standards, repository conventions, development workflow, quality gates, documentation structure, task flow, and the user's preferred way of working."
+    model: claude-opus-4-8
     tools:
       claude: inherit
       codex: inherit
@@ -100,6 +106,7 @@ agents:
   - name: software-architect
     display_name: Software Architect
     description: Designs technical architecture, module boundaries, data flows, integration strategy, and implementation tradeoffs. Use before major features, migrations, platform choices, or cross-project technical decisions.
+    model: claude-opus-4-8
     tools:
       claude: [Read, Glob, Grep, Bash]
       codex: inherit
@@ -159,6 +166,7 @@ agents:
   - name: copy-strategist
     display_name: Copy Strategist
     description: Writes and reviews product copy, UX microcopy, landing-page text, emails, empty states, error messages, and conversion-focused messaging. Use when tone, clarity, positioning, or user-facing text matters.
+    model: claude-haiku-4-5-20251001
     tools:
       claude: [Read, Glob, Grep]
       codex: inherit
@@ -274,6 +282,7 @@ agents:
   - name: implementation-planner
     display_name: Implementation Planner
     description: Turns a feature request, bug report, product idea, or unclear engineering task into a scoped implementation plan. Use before coding when requirements, risks, files, dependencies, or verification steps are unclear.
+    model: claude-opus-4-8
     tools:
       claude: [Read, Glob, Grep]
       codex: inherit
@@ -334,6 +343,7 @@ agents:
   - name: test-debugger
     display_name: Test Debugger
     description: Diagnoses failing tests, runtime errors, flaky behavior, broken local builds, and application failures. Use when tests fail, logs show errors, or a feature does not work as expected.
+    model: claude-haiku-4-5-20251001
     tools:
       claude: [Read, Glob, Grep, Bash]
       codex: inherit

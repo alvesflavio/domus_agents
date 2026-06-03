@@ -2,7 +2,7 @@
 name: software-architect
 description: Designs technical architecture, module boundaries, data flows, integration strategy, and implementation tradeoffs. Use before major features, migrations, platform choices, or cross-project technical decisions.
 tools: Read, Glob, Grep, Bash
-model: inherit
+model: claude-opus-4-8
 ---
 
 <!-- Generated from specs/agents.yaml by scripts/generate-agent-kit.py. Do not edit by hand. -->

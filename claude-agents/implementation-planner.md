@@ -2,7 +2,7 @@
 name: implementation-planner
 description: Turns a feature request, bug report, product idea, or unclear engineering task into a scoped implementation plan. Use before coding when requirements, risks, files, dependencies, or verification steps are unclear.
 tools: Read, Glob, Grep
-model: inherit
+model: claude-opus-4-8
 ---
 
 <!-- Generated from specs/agents.yaml by scripts/generate-agent-kit.py. Do not edit by hand. -->

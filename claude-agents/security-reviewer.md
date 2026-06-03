@@ -2,7 +2,7 @@
 name: security-reviewer
 description: Reviews code, architecture, dependencies, auth flows, data handling, secrets, permissions, and integrations for security risks. Use before shipping sensitive changes or when investigating vulnerabilities.
 tools: Read, Glob, Grep, Bash
-model: inherit
+model: claude-sonnet-4-6
 ---
 
 <!-- Generated from specs/agents.yaml by scripts/generate-agent-kit.py. Do not edit by hand. -->

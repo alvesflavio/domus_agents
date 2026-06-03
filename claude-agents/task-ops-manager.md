@@ -1,7 +1,7 @@
 ---
 name: task-ops-manager
 description: Manages implementation tasks across Notion and GitHub Projects. Use to create, update, sync, prioritize, and report tasks, issues, project items, status, owners, deadlines, and next actions.
-model: inherit
+model: claude-sonnet-4-6
 ---
 
 <!-- Generated from specs/agents.yaml by scripts/generate-agent-kit.py. Do not edit by hand. -->
