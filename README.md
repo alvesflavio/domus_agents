@@ -6,8 +6,10 @@ It includes a lean startup-style agent team with:
 
 - A default coordinator/router for complex work
 - Product, architecture, UX/UI, copy, security, DevOps, planning, task ops, code review, and debugging specialists
-- Equivalent Claude subagents and Codex skills
+- **Both Claude Code subagents AND Codex skills**, fully synchronized
+- Per-agent model selection (Opus for complex, Sonnet for general, Haiku for simple)
 - A shared token-efficiency protocol
+- Automatic deployment via git hooks
 - A `specialist_name: TODO` field in every agent so each specialist can receive a character/person name without changing its technical routing name
 
 ## Structure
@@ -38,17 +40,24 @@ For full details, see `AUTOMATION.md`.
 
 ## Core Team
 
-- `workstyle-standards-coordinator`: default coordinator and router
+- `workstyle-standards-coordinator`: default coordinator and router (Opus)
 - `product-strategist`: product strategy and MVP scope
-- `software-architect`: architecture and technical decisions
+- `software-architect`: architecture and technical decisions (Opus)
 - `ux-ui-designer`: flows, screens, UI, accessibility
-- `copy-strategist`: product copy and messaging
+- `copy-strategist`: product copy and messaging (Haiku)
 - `security-reviewer`: security review and remediation
 - `devops-release-manager`: Git, CI/CD, deployments, releases
 - `task-ops-manager`: Notion and GitHub Projects task operations
-- `implementation-planner`: implementation planning
+- `implementation-planner`: implementation planning (Opus)
 - `code-reviewer`: code quality review
-- `test-debugger`: failing tests and runtime debugging
+- `test-debugger`: failing tests and runtime debugging (Haiku)
+
+## Two Platforms
+
+- **Claude Code**: Agents available via `@agent-name` (globally installed)
+- **Codex**: Skills available via `/skill-name` (fully synchronized)
+
+Both platforms stay in sync automatically. See `CODEX-INTEGRATION.md` for Codex setup.
 
 ## Naming Characters
 
