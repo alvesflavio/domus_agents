@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Generate the Domus Agents kit from the canonical spec.
 
-Reads specs/agents.yaml and writes all platform outputs so Claude Code,
-Codex, and Antigravity stay uniform:
+Reads specs/agents.yaml and writes platform outputs for each agent according
+to its `platforms` list (defaults to all three if omitted):
 
   - claude-agents/<name>.md             Claude Code subagents
   - codex-skills/<name>/SKILL.md        Codex skills
@@ -142,14 +142,26 @@ def write(path: Path, content: str) -> None:
     print(f"  wrote {path.relative_to(REPO_ROOT)}")
 
 
+ALL_PLATFORMS = {"claude", "codex", "antigravity"}
+
+
+def agent_platforms(agent: dict, defaults: dict) -> set[str]:
+    raw = agent.get("platforms", defaults.get("platforms", sorted(ALL_PLATFORMS)))
+    return set(raw)
+
+
 def expected_outputs(agent: dict, defaults: dict) -> dict[Path, str]:
     name = agent["name"]
-    return {
-        CLAUDE_DIR / f"{name}.md": render_claude(agent, defaults),
-        CODEX_DIR / name / "SKILL.md": render_codex(agent, defaults),
-        CODEX_AGENTS_DIR / f"{name}.toml": render_codex_agent(agent, defaults),
-        ANTIGRAVITY_DIR / f"{name}.md": render_antigravity(agent, defaults),
-    }
+    platforms = agent_platforms(agent, defaults)
+    outputs: dict[Path, str] = {}
+    if "claude" in platforms:
+        outputs[CLAUDE_DIR / f"{name}.md"] = render_claude(agent, defaults)
+    if "codex" in platforms:
+        outputs[CODEX_DIR / name / "SKILL.md"] = render_codex(agent, defaults)
+        outputs[CODEX_AGENTS_DIR / f"{name}.toml"] = render_codex_agent(agent, defaults)
+    if "antigravity" in platforms:
+        outputs[ANTIGRAVITY_DIR / f"{name}.md"] = render_antigravity(agent, defaults)
+    return outputs
 
 
 def check_outputs(outputs: dict[Path, str]) -> int:
@@ -193,13 +205,19 @@ def main() -> int:
     if args.check:
         return check_outputs(outputs)
 
+    platform_counts: dict[str, int] = {p: 0 for p in ALL_PLATFORMS}
+    for agent in agents:
+        for p in agent_platforms(agent, defaults):
+            if p in platform_counts:
+                platform_counts[p] += 1
+
     print(f"Generating {len(agents)} agents from {SPEC_PATH.relative_to(REPO_ROOT)}")
     for path, content in outputs.items():
         write(path, content)
 
     print(
-        f"Done. {len(agents)} Claude agents, {len(agents)} Codex skills, "
-        f"{len(agents)} Codex agents, and {len(agents)} Antigravity agents generated."
+        f"Done. {platform_counts['claude']} Claude, {platform_counts['codex']} Codex, "
+        f"and {platform_counts['antigravity']} Antigravity agents generated."
     )
     return 0
 

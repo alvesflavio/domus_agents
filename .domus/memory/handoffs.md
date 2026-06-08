@@ -4,6 +4,15 @@ Append newest entries at the top of the log. Keep entries compact and factual.
 
 ## Log
 
+### 2026-06-08T03:30:00Z | platform: Claude Code | agent: workstyle-standards-coordinator
+
+- Task: Divide agents between Claude and Codex only (no Antigravity assignments yet).
+- Actions: Added `platforms` field support to `generate-agent-kit.py`; assigned `platforms: [claude]` to 5 deep-reasoning agents and `platforms: [codex]` to 6 execution/product agents in `specs/agents.yaml`; regenerated all outputs; removed orphaned files; updated `shared.md` with the durable decision.
+- Files touched: `scripts/generate-agent-kit.py`, `specs/agents.yaml`, `claude-agents/` (5 kept, 6 removed), `codex-skills/` (6 kept, 5 removed), `.codex/agents/` (6 kept, 5 removed), `antigravity-agents/` (removed entirely), `.domus/memory/shared.md`, `.domus/memory/handoffs.md`.
+- Status: done.
+- Blocker: None.
+- Next agent/action: If Antigravity gets agents assigned, add `platforms: [antigravity]` entries in `specs/agents.yaml` and re-run the generator.
+
 ### 2026-06-08T03:00:00Z | platform: Claude Code | agent: workstyle-standards-coordinator
 
 - Task: Add Antigravity platform support so agents stay uniform across Claude Code, Codex, and Antigravity.

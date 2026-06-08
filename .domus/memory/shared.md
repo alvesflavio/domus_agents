@@ -13,6 +13,7 @@ Durable project context shared by Claude Code and Codex agents.
 - `.domus/memory/handoffs.md` is the cross-platform action log (Claude Code, Codex, Antigravity); `.domus/memory/shared.md` is reserved for durable facts, decisions, conventions, and explicit user preferences.
 - Antigravity agents are generated from `specs/agents.yaml` to `antigravity-agents/*.md` using YAML frontmatter (`name`, `description`, `model`, `platform: antigravity`) and the same shared body as Claude and Codex. No hand-editing of generated files.
 - Record decisions that future agents should not re-litigate without new evidence.
+- Agents are divided by platform strength: Claude gets the 5 deep-reasoning specialists (coordinator, architect, implementation-planner, security-reviewer, code-reviewer); Codex gets the 6 execution/product specialists (devops-release-manager, test-debugger, task-ops-manager, product-strategist, ux-ui-designer, copy-strategist). Antigravity is supported by the generator but not yet assigned agents. The `platforms` field in `specs/agents.yaml` controls this — omitting it defaults to all platforms.
 
 ## User Preferences
 

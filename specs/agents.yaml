@@ -51,6 +51,7 @@ agents:
   - name: workstyle-standards-coordinator
     display_name: Workstyle Standards Coordinator
     specialist_name: pedro_CTO
+    platforms: [claude]
     description: "Coordinates reusable standards and automatically routes work to the right specialist agents. Use as the default entry point for complex tasks, cross-project standards, repository conventions, development workflow, quality gates, documentation structure, task flow, and the user's preferred way of working."
     model: claude-opus-4-8
     tools:
@@ -114,6 +115,7 @@ agents:
   - name: product-strategist
     display_name: Product Strategist
     specialist_name: andre_produto
+    platforms: [codex]
     description: Defines product strategy, MVP scope, prioritization, user problems, requirements, experiments, and roadmap tradeoffs. Use when deciding what to build, validating demand, turning ideas into product specs, or aligning product work with UX/UI.
     tools:
       claude: [Read, Glob, Grep]
@@ -137,6 +139,7 @@ agents:
   - name: software-architect
     display_name: Software Architect
     specialist_name: joao_arquiteto
+    platforms: [claude]
     description: Designs technical architecture, module boundaries, data flows, integration strategy, and implementation tradeoffs. Use before major features, migrations, platform choices, or cross-project technical decisions.
     model: claude-opus-4-8
     tools:
@@ -169,6 +172,7 @@ agents:
   - name: ux-ui-designer
     display_name: UX UI Designer
     specialist_name: filipe_UX
+    platforms: [codex]
     description: Designs and reviews user flows, UI structure, interaction patterns, accessibility, visual hierarchy, and frontend ergonomics. Use for product screens, dashboards, forms, navigation, design critique, and UI implementation guidance.
     tools:
       claude: [Read, Glob, Grep, Bash]
@@ -199,6 +203,7 @@ agents:
   - name: copy-strategist
     display_name: Copy Strategist
     specialist_name: judas_tadeu_copy
+    platforms: [codex]
     description: Writes and reviews product copy, UX microcopy, landing-page text, emails, empty states, error messages, and conversion-focused messaging. Use when tone, clarity, positioning, or user-facing text matters.
     model: claude-haiku-4-5-20251001
     tools:
@@ -228,6 +233,7 @@ agents:
   - name: security-reviewer
     display_name: Security Reviewer
     specialist_name: bartolomeu_security
+    platforms: [claude]
     description: Reviews code, architecture, dependencies, auth flows, data handling, secrets, permissions, and integrations for security risks. Use before shipping sensitive changes or when investigating vulnerabilities.
     tools:
       claude: [Read, Glob, Grep, Bash]
@@ -258,6 +264,7 @@ agents:
   - name: devops-release-manager
     display_name: DevOps Release Manager
     specialist_name: tiago_release
+    platforms: [codex]
     description: Manages Git problems, CI/CD, deployments, releases, environments, build failures, rollback planning, branch hygiene, and production incident triage. Use when Git, GitHub, CI, deployment, environment, or release flow breaks.
     tools:
       claude: [Read, Glob, Grep, Bash]
@@ -286,6 +293,7 @@ agents:
   - name: task-ops-manager
     display_name: Task Ops Manager
     specialist_name: mateus_ops
+    platforms: [codex]
     description: Manages implementation tasks across Notion and GitHub Projects. Use to create, update, sync, prioritize, and report tasks, issues, project items, status, owners, deadlines, and next actions.
     tools:
       claude: inherit
@@ -319,6 +327,7 @@ agents:
   - name: implementation-planner
     display_name: Implementation Planner
     specialist_name: tiago_planner
+    platforms: [claude]
     description: Turns a feature request, bug report, product idea, or unclear engineering task into a scoped implementation plan. Use before coding when requirements, risks, files, dependencies, or verification steps are unclear.
     model: claude-opus-4-8
     tools:
@@ -351,6 +360,7 @@ agents:
   - name: code-reviewer
     display_name: Code Reviewer
     specialist_name: tome_reviewer
+    platforms: [claude]
     description: Reviews code changes for correctness, maintainability, security, accessibility, and missing tests. Use after implementation work, before opening a pull request, or when reviewing recent changes for risks.
     tools:
       claude: [Read, Glob, Grep, Bash]
@@ -382,6 +392,7 @@ agents:
   - name: test-debugger
     display_name: Test Debugger
     specialist_name: simao_debugger
+    platforms: [codex]
     description: Diagnoses failing tests, runtime errors, flaky behavior, broken local builds, and application failures. Use when tests fail, logs show errors, or a feature does not work as expected.
     model: claude-haiku-4-5-20251001
     tools:
