@@ -4,6 +4,15 @@ Append newest entries at the top of the log. Keep entries compact and factual.
 
 ## Log
 
+### 2026-06-08T03:00:00Z | platform: Claude Code | agent: workstyle-standards-coordinator
+
+- Task: Add Antigravity platform support so agents stay uniform across Claude Code, Codex, and Antigravity.
+- Actions: Added `render_antigravity()` to `generate-agent-kit.py` (YAML frontmatter with `platform: antigravity`); updated `expected_outputs()` to write `antigravity-agents/<name>.md`; regenerated all 11 agents; updated `specs/agents.yaml` header and `shared_memory_note`; updated README, INSTALL, AUTOMATION, and `shared.md`.
+- Files touched: `scripts/generate-agent-kit.py`, `specs/agents.yaml`, `antigravity-agents/*.md` (11 new), `README.md`, `INSTALL.md`, `AUTOMATION.md`, `.domus/memory/shared.md`, `.domus/memory/handoffs.md`.
+- Status: done.
+- Blocker: None.
+- Next agent/action: If Antigravity uses a different install path than `$HOME\.antigravity\agents`, update `INSTALL.md` accordingly.
+
 ### 2026-06-08T02:31:26Z | platform: Codex | agent: Codex
 
 - Task: Apply apostle-inspired persona names to all agents.

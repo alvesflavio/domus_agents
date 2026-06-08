@@ -1,11 +1,11 @@
 ---
 name: code-reviewer
 description: Reviews code changes for correctness, maintainability, security, accessibility, and missing tests. Use after implementation work, before opening a pull request, or when reviewing recent changes for risks.
+model: claude-sonnet-4-6
+platform: antigravity
 ---
 
 <!-- Generated from specs/agents.yaml by scripts/generate-agent-kit.py. Do not edit by hand. -->
-
-# Code Reviewer
 
 ## Agent Identity
 

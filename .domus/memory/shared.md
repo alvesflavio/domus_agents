@@ -8,9 +8,10 @@ Durable project context shared by Claude Code and Codex agents.
 
 ## Decisions
 
-- Domus shared memory is project-local under `.domus/memory/`, so Claude Code and Codex agents working in the same repository can read and update the same handoff state.
-- `AGENTS.md` is the shared instruction entry point; `CLAUDE.md` imports it with `@AGENTS.md` so Claude Code and Codex follow the same project-memory protocol.
-- `.domus/memory/handoffs.md` is the cross-platform action log; `.domus/memory/shared.md` is reserved for durable facts, decisions, conventions, and explicit user preferences.
+- Domus shared memory is project-local under `.domus/memory/`, so Claude Code, Codex, and Antigravity agents working in the same repository can read and update the same handoff state.
+- `AGENTS.md` is the shared instruction entry point; `CLAUDE.md` imports it with `@AGENTS.md` so Claude Code, Codex, and Antigravity follow the same project-memory protocol.
+- `.domus/memory/handoffs.md` is the cross-platform action log (Claude Code, Codex, Antigravity); `.domus/memory/shared.md` is reserved for durable facts, decisions, conventions, and explicit user preferences.
+- Antigravity agents are generated from `specs/agents.yaml` to `antigravity-agents/*.md` using YAML frontmatter (`name`, `description`, `model`, `platform: antigravity`) and the same shared body as Claude and Codex. No hand-editing of generated files.
 - Record decisions that future agents should not re-litigate without new evidence.
 
 ## User Preferences

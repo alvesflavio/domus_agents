@@ -1,6 +1,6 @@
 # Portable Agent Kit
 
-This kit keeps one canonical agent spec and provides platform-specific files for Claude Code and Codex.
+This kit keeps one canonical agent spec and provides platform-specific files for Claude Code, Codex, and Antigravity.
 
 ## Files
 
@@ -9,7 +9,8 @@ This kit keeps one canonical agent spec and provides platform-specific files for
 - `claude-agents/*.md`: Claude Code subagents.
 - `codex-skills/*/SKILL.md`: Codex skills with equivalent behavior.
 - `.codex/agents/*.toml`: Codex agents with equivalent behavior.
-- `scripts/init-shared-memory.ps1`: initializes project-local shared memory for Claude/Codex handoffs.
+- `antigravity-agents/*.md`: Antigravity agents with equivalent behavior.
+- `scripts/init-shared-memory.ps1`: initializes project-local shared memory for Claude/Codex/Antigravity handoffs.
 
 ## Included Agents
 
@@ -74,6 +75,17 @@ This creates or updates:
 
 Restart Claude Code and Codex sessions in that project after initialization.
 
+## Install For Antigravity
+
+Copy the generated agents to your Antigravity agents directory:
+
+```powershell
+New-Item -ItemType Directory -Force -Path "$HOME\.antigravity\agents"
+Copy-Item antigravity-agents\*.md "$HOME\.antigravity\agents\"
+```
+
+Restart your Antigravity session after copying so the agents are discoverable.
+
 ## Add Or Edit An Agent
 
 The Claude and Codex files are generated. Edit the spec, never the generated files.
@@ -91,7 +103,7 @@ The Claude and Codex files are generated. Edit the spec, never the generated fil
    powershell -File scripts\validate-agent-kit.ps1
    ```
 
-Keep each `description` explicit and platform-neutral, because both systems use it to decide when to invoke the agent or skill. Avoid platform-specific wording such as "when Codex is asked to ..." so routing stays uniform.
+Keep each `description` explicit and platform-neutral, because Claude Code, Codex, and Antigravity all use it to decide when to invoke the agent. Avoid platform-specific wording such as "when Codex is asked to ..." so routing stays uniform across all three platforms.
 
 ## Name The Characters
 

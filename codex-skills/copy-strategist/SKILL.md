@@ -36,7 +36,7 @@ Ask for or infer the surface, audience, and desired action first. Review only th
 
 ## Shared Project Memory
 
-When the current project contains `.domus/memory/`, treat it as the shared memory layer between Claude Code and Codex agents.
+When the current project contains `.domus/memory/`, treat it as the shared memory layer between Claude Code, Codex, and Antigravity agents.
 
 Before starting delegated, cross-agent, continuation, coordination, planning, review, or debugging work, read:
 

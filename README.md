@@ -6,7 +6,7 @@ It includes a lean startup-style agent team with:
 
 - A default coordinator/router for complex work
 - Product, architecture, UX/UI, copy, security, DevOps, planning, task ops, code review, and debugging specialists
-- **Claude Code subagents, Codex skills, and Codex agents**, fully synchronized
+- **Claude Code subagents, Codex skills, Codex agents, and Antigravity agents**, fully synchronized
 - Per-agent model selection (Opus for complex, Sonnet for general, Haiku for simple)
 - A shared token-efficiency protocol
 - Project-local shared memory for Claude/Codex handoffs
@@ -20,19 +20,20 @@ It includes a lean startup-style agent team with:
 - `claude-agents/*.md`: Claude Code subagents (generated).
 - `codex-skills/*/SKILL.md`: Codex skills (generated).
 - `.codex/agents/*.toml`: Codex agents (generated).
+- `antigravity-agents/*.md`: Antigravity agents (generated).
 - `scripts/generate-agent-kit.py`: generates all platform outputs from `specs/agents.yaml`.
 - `scripts/validate-agent-kit.ps1`: local validation, including cross-platform description parity.
 - `scripts/init-shared-memory.ps1`: initializes project-local Claude/Codex shared memory.
 - `SHARED-MEMORY.md`: shared memory protocol and handoff format.
 - `INSTALL.md`: installation instructions.
 
-## Uniform Claude + Codex
+## Uniform Across Platforms
 
-Both platforms are generated from one spec so each specialist behaves identically:
+All platforms are generated from one spec so each specialist behaves identically:
 
-- Same `description` (so routing triggers the same agent on both platforms).
+- Same `description` (so routing triggers the same agent on every platform).
 - Same body: identity, role, and structured sections.
-- Only the frontmatter differs, because each platform requires a different shape (Claude declares `tools`/`model`; Codex adds an H1 title).
+- Only the frontmatter differs per platform: Claude declares `tools`/`model`; Codex adds an H1 title; Antigravity adds `platform: antigravity`.
 
 Do not edit the generated files by hand. Edit `specs/agents.yaml` and automation takes care of the rest:
 
@@ -56,16 +57,17 @@ For full details, see `AUTOMATION.md`.
 - `code-reviewer`: code quality review
 - `test-debugger`: failing tests and runtime debugging (Haiku)
 
-## Two Platforms
+## Three Platforms
 
 - **Claude Code**: Agents available via `@agent-name` (globally installed)
 - **Codex**: Agents available globally plus skills available via `/skill-name` (fully synchronized)
+- **Antigravity**: Agents installed from `antigravity-agents/*.md` (fully synchronized)
 
-Both platforms stay in sync automatically. See `CODEX-INTEGRATION.md` for Codex setup.
+All three platforms stay in sync automatically — same `description`, same body, only the frontmatter differs. See `CODEX-INTEGRATION.md` for Codex setup and `INSTALL.md` for Antigravity setup.
 
 ## Shared Memory
 
-To let Claude Code and Codex agents see each other's last action inside a project, initialize Domus shared memory in that project:
+To let Claude Code, Codex, and Antigravity agents see each other's last action inside a project, initialize Domus shared memory in that project:
 
 ```powershell
 powershell -File scripts\init-shared-memory.ps1 -ProjectRoot C:\path\to\project
