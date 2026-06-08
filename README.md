@@ -11,7 +11,7 @@ It includes a lean startup-style agent team with:
 - A shared token-efficiency protocol
 - Project-local shared memory for Claude/Codex handoffs
 - Automatic deployment via git hooks
-- A `specialist_name: TODO` field in every agent so each specialist can receive a character/person name without changing its technical routing name
+- A configurable `specialist_name` field so each specialist can receive a character/person name without changing its technical routing name
 
 ## Structure
 
@@ -83,4 +83,24 @@ Each agent includes:
 specialist_name: TODO
 ```
 
-Replace `TODO` with the character name you want. Keep the technical `name` unchanged because Claude and Codex use it for routing.
+Set `defaults.specialist_name` to apply the same character name to every agent, or set `specialist_name` on one agent to override only that specialist. Keep the technical `name` unchanged because Claude and Codex use it for routing.
+
+## Apostolic Persona Map
+
+The default persona names are inspired by the traditional personalities and narrative roles of Jesus' apostles. These names are intentionally stored in `specialist_name`, not in the technical `name`, so they shape identity without changing routing, tools, model selection, or behavior.
+
+| Technical agent | Persona name | Rationale |
+| --- | --- | --- |
+| `workstyle-standards-coordinator` | `pedro_CTO` | Peter is the natural coordinator figure: direct, visible, responsible for holding the group together, and often the first to act. That maps well to the default entry point that classifies work, routes specialists, owns standards, and makes practical coordination calls. |
+| `product-strategist` | `andre_produto` | Andrew is remembered as someone who brings people and opportunities forward, including introducing others to Jesus. That fits product strategy: noticing needs, connecting the user's problem to the right opportunity, and turning early signals into a focused product direction. |
+| `software-architect` | `joao_arquiteto` | John is the most contemplative and theologically deep of the apostolic voices. That fits architecture work because it needs long-range thinking, pattern recognition, conceptual clarity, and the patience to design structure rather than only react to the immediate task. |
+| `ux-ui-designer` | `filipe_UX` | Philip often asks for what can be seen and made concrete. That fits UX/UI because the role translates abstract goals into visible screens, flows, states, hierarchy, and interactions users can actually understand and complete. |
+| `copy-strategist` | `judas_tadeu_copy` | Jude/Thaddeus is associated with a clarifying question that asks why something is revealed to some and not others. That maps to copy work: audience awareness, clear messaging, removing ambiguity, and making intent understandable in the user's language. |
+| `security-reviewer` | `bartolomeu_security` | Bartholomew is traditionally identified with Nathanael, described as a person without deceit. That makes him a strong fit for security review, where integrity, trust boundaries, hidden assumptions, and false confidence matter more than surface polish. |
+| `devops-release-manager` | `tiago_release` | James son of Zebedee is forceful, decisive, and associated with bold action. That fits release and incident work, where the agent must inspect operational state, make controlled decisions under pressure, preserve rollback paths, and keep delivery moving. |
+| `task-ops-manager` | `mateus_ops` | Matthew's background as a tax collector suggests records, ledgers, traceability, and administrative discipline. That fits task operations across Notion, GitHub Projects, issues, statuses, owners, blockers, and next actions. |
+| `implementation-planner` | `tiago_planner` | James son of Alphaeus is quieter and less narratively prominent, which fits a planning role that should be careful, structured, and useful without taking over implementation. The persona reinforces low-drama sequencing, assumptions, risks, and verification steps. |
+| `code-reviewer` | `tome_reviewer` | Thomas asks for evidence before accepting a claim. That is exactly the stance of a strong code reviewer: skeptical, concrete, grounded in changed behavior, and unwilling to approve vague reasoning without proof. |
+| `test-debugger` | `simao_debugger` | Simon the Zealot suggests persistence, intensity, and commitment to a cause. That fits debugging: staying with failures, isolating root cause, testing hypotheses, and pushing through noisy logs or flaky behavior until the issue is understood. |
+
+`judas_iscariotes` is intentionally not used for a standard operating agent. If the kit later adds an adversarial red-team, abuse-case, or betrayal-mode reviewer, that symbolism could fit there without making it part of the normal delivery team.

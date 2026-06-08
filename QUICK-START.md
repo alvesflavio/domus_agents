@@ -64,11 +64,13 @@ This regenerates, validates, and deploys to both platforms in one shot.
 
 ## Customization
 
-To customize the character names (e.g., "specialist_name: Claude"):
+To customize the character names (e.g., `specialist_name: pedro_CTO`):
 
 1. Edit `specs/agents.yaml`
-2. Change `specialist_name: TODO` to your preferred name in `defaults:`
-3. Commit -> hook regenerates all agents with the new name
+2. Change `defaults.specialist_name` for a shared name, or add `specialist_name` under one agent for a per-agent name
+3. Commit -> hook regenerates all agents with the configured names
+
+The default kit includes an apostolic persona map in `README.md`, with the rationale for each specialist's name.
 
 ## Troubleshooting
 

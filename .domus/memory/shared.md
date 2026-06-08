@@ -20,3 +20,4 @@ Durable project context shared by Claude Code and Codex agents.
 ## Conventions
 
 - Record project-specific commands, naming, review, testing, and deployment conventions.
+- Agent persona naming uses apostle-inspired `specialist_name` values; keep technical routing names unchanged. Current map: `workstyle-standards-coordinator` -> `pedro_CTO`, `product-strategist` -> `andre_produto`, `software-architect` -> `joao_arquiteto`, `ux-ui-designer` -> `filipe_UX`, `copy-strategist` -> `judas_tadeu_copy`, `security-reviewer` -> `bartolomeu_security`, `devops-release-manager` -> `tiago_release`, `task-ops-manager` -> `mateus_ops`, `implementation-planner` -> `tiago_planner`, `code-reviewer` -> `tome_reviewer`, `test-debugger` -> `simao_debugger`.

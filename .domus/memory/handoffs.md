@@ -4,6 +4,33 @@ Append newest entries at the top of the log. Keep entries compact and factual.
 
 ## Log
 
+### 2026-06-08T02:31:26Z | platform: Codex | agent: Codex
+
+- Task: Apply apostle-inspired persona names to all agents.
+- Actions: Added per-agent `specialist_name` values for all 11 agents, expanded README rationale for each apostolic persona, updated quick-start customization docs, regenerated generated outputs, deployed to Claude/Codex locations, and validated generated parity.
+- Files touched: `specs/agents.yaml`, `README.md`, `QUICK-START.md`, `claude-agents/*`, `codex-skills/*/SKILL.md`, `.codex/agents/*.toml`, `.claude/agents/*`, `.domus/memory/shared.md`, `.domus/memory/handoffs.md`.
+- Status: done.
+- Blocker: None.
+- Next agent/action: Continue calling agents by technical names; personas are in `specialist_name`.
+
+### 2026-06-08T01:55:50Z | platform: Codex | agent: Codex
+
+- Task: Make coordinator persona name configurable without changing behavior.
+- Actions: Set `workstyle-standards-coordinator` `specialist_name` to `wojtyla_CTO`, documented per-agent naming configuration, regenerated generated outputs, and validated parity.
+- Files touched: `specs/agents.yaml`, `claude-agents/workstyle-standards-coordinator.md`, `codex-skills/workstyle-standards-coordinator/SKILL.md`, `.codex/agents/workstyle-standards-coordinator.toml`, `README.md`, `QUICK-START.md`, `.domus/memory/shared.md`, `.domus/memory/handoffs.md`.
+- Status: done.
+- Blocker: None.
+- Next agent/action: Use `specialist_name` for persona names; keep technical `name` fields stable for routing.
+
+### 2026-06-08T01:53:19Z | platform: Codex | agent: Codex
+
+- Task: Record user-defined agent name.
+- Actions: Added durable naming convention that `workstyle-standards-coordinator` is named `wojtyla_CTO`.
+- Files touched: `.domus/memory/shared.md`, `.domus/memory/handoffs.md`.
+- Status: done.
+- Blocker: None.
+- Next agent/action: Use `wojtyla_CTO` when referring to `workstyle-standards-coordinator`.
+
 ### 2026-06-08T01:44:37Z | platform: Codex | agent: workstyle-standards-coordinator
 
 - Task: Make shared-memory initialization token-efficient and coordinator-owned.
