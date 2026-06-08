@@ -4,7 +4,9 @@ $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 $codexDir = Join-Path $repoRoot "codex-skills"
+$codexAgentsDir = Join-Path (Join-Path $repoRoot ".codex") "agents"
 $globalCodexDir = Join-Path $HOME ".codex\skills"
+$globalCodexAgentsDir = Join-Path $HOME ".codex\agents"
 
 Write-Output "Installing Domus Agents for Codex..."
 Write-Output ""
@@ -28,7 +30,18 @@ Get-ChildItem -Path $codexDir -Directory | ForEach-Object {
 }
 
 Write-Output ""
-Write-Output "Done! Codex skills installed globally."
-Write-Output "Location: $globalCodexDir"
+Write-Output "Creating $globalCodexAgentsDir..."
+New-Item -ItemType Directory -Force -Path $globalCodexAgentsDir > $null
+
+Write-Output "Copying agents..."
+Get-ChildItem -Path $codexAgentsDir -Filter "*.toml" -File | ForEach-Object {
+  Copy-Item $_.FullName (Join-Path $globalCodexAgentsDir $_.Name) -Force
+  Write-Output "  OK: $($_.Name)"
+}
+
+Write-Output ""
+Write-Output "Done! Codex skills and agents installed globally."
+Write-Output "Skills location: $globalCodexDir"
+Write-Output "Agents location: $globalCodexAgentsDir"
 Write-Output ""
 Write-Output "Start a new Codex session to discover the skills."

@@ -29,4 +29,18 @@ Prefer small shippable increments, measurable outcomes, and fast validation. Avo
 
 Ask for or infer the target user, problem, goal, and constraint first. Return compact specs, priority calls, and experiment plans. Avoid long product theory unless it directly changes the decision.
 
+## Shared Project Memory
+
+When the current project contains `.domus/memory/`, treat it as the shared memory layer between Claude Code and Codex agents.
+
+Before starting delegated, cross-agent, continuation, coordination, planning, review, or debugging work, read:
+
+- `.domus/memory/handoffs.md` for the latest agent actions, current task state, blockers, and requested next agent.
+- `.domus/memory/shared.md` for durable project facts, decisions, conventions, and user preferences.
+- `.domus/memory/agents/<agent-name>.md` when it exists for specialist-specific context.
+
+If the user says an agent assigned, handed off, continued, remembered, or queued work, inspect the shared memory before acting. If you complete meaningful work, discover a durable fact, make a project decision, hit a blocker, or delegate to another agent, append a concise entry to `.domus/memory/handoffs.md` with: timestamp, platform if known, agent name, task, actions taken, files touched, status, blocker, and next agent/action. Update `.domus/memory/shared.md` only for durable information that should survive future sessions.
+
+Keep memory entries factual and compact. Do not store secrets, credentials, tokens, private personal data, or noisy transient logs. If the memory files do not exist, continue normally and mention that shared project memory is not initialized.
+
 Respond in the user's language unless the user asks otherwise.

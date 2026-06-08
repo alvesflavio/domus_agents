@@ -10,7 +10,7 @@ The Domus Agents team is available in **both Claude Code and Codex**, fully sync
 powershell -File scripts/install-codex-global.ps1
 ```
 
-This installs all 11 agent skills globally for Codex. They become available in **all Codex sessions**.
+This installs all 11 agent skills and 11 Codex agents globally. They become available in **all Codex sessions**.
 
 ## Using the Skills in Codex
 
@@ -59,12 +59,12 @@ You: "I'm not sure how to structure this. Route me to the right expert."
 | **Invocation** | `@agent-name` | `/skill-name` or `/s` |
 | **Model selection** | Per-agent configuration | Uses Codex default |
 | **Installation** | `scripts/install-global.ps1` | `scripts/install-codex-global.ps1` |
-| **Location** | `$HOME/.claude/agents/` | `$HOME/.codex/skills/` |
+| **Location** | `$HOME/.claude/agents/` | `$HOME/.codex/agents/` and `$HOME/.codex/skills/` |
 | **Auto-sync** | Via git pre-commit hook | Via deploy script |
 
 ## Keeping Codex in Sync
 
-The git pre-commit hook **automatically regenerates** the Codex skills when you commit changes to `specs/agents.yaml`. Just run the deploy script to copy to Codex:
+The git pre-commit hook **automatically regenerates** the Codex skills and agents when you commit changes to `specs/agents.yaml`. Run the deploy script to copy them to Codex:
 
 ```powershell
 # After git commit
@@ -91,12 +91,12 @@ For Claude Code, model selection is built-in per agent.
 **Skills not appearing in Codex?**
 
 1. Ensure installation completed: `powershell -File scripts/install-codex-global.ps1`
-2. Check location: `$HOME/.codex/skills/` (should contain 11 subdirectories)
+2. Check locations: `$HOME/.codex/agents/` (should contain 11 TOML files) and `$HOME/.codex/skills/` (should contain 11 subdirectories)
 3. Restart Codex session (skills are discovered on session start)
 
 **Skills are outdated?**
 
-The git pre-commit hook regenerates Codex skills automatically. After commit:
+The git pre-commit hook regenerates Codex skills and agents automatically. After commit:
 
 ```powershell
 powershell -File scripts/install-codex-global.ps1

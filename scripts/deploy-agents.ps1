@@ -7,8 +7,10 @@ $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 $claudeDir = Join-Path $root "claude-agents"
 $codexDir = Join-Path $root "codex-skills"
+$codexAgentsDir = Join-Path (Join-Path $root ".codex") "agents"
 $projectAgentsDir = Join-Path (Join-Path $root ".claude") "agents"
 $userCodexDir = Join-Path $HOME ".codex\skills"
+$userCodexAgentsDir = Join-Path $HOME ".codex\agents"
 
 Write-Output "Domus Agents Deploy`n"
 
@@ -39,6 +41,13 @@ Get-ChildItem -Path $codexDir -Directory | ForEach-Object {
     Copy-Item $skillMd (Join-Path $skillDir "SKILL.md") -Force
     Write-Output "  OK: $($_.Name)"
   }
+}
+
+Write-Output "`nDeploying Codex agents..."
+New-Item -ItemType Directory -Force -Path $userCodexAgentsDir > $null
+Get-ChildItem -Path $codexAgentsDir -Filter "*.toml" -File | ForEach-Object {
+  Copy-Item $_.FullName (Join-Path $userCodexAgentsDir $_.Name) -Force
+  Write-Output "  OK: $($_.Name)"
 }
 
 Write-Output "`nComplete! Restart Claude Code and Codex sessions."

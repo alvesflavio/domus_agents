@@ -6,6 +6,7 @@ Codex stay uniform:
 
   - claude-agents/<name>.md        Claude Code subagents
   - codex-skills/<name>/SKILL.md   Codex skills
+  - .codex/agents/<name>.toml      Codex agents
 
 The body (identity + sections + language note) is identical across platforms.
 Only the frontmatter differs, because each platform requires a different shape:
@@ -19,6 +20,7 @@ Run from the repo root:
 
 from __future__ import annotations
 
+import argparse
 import sys
 from pathlib import Path
 
@@ -31,6 +33,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 SPEC_PATH = REPO_ROOT / "specs" / "agents.yaml"
 CLAUDE_DIR = REPO_ROOT / "claude-agents"
 CODEX_DIR = REPO_ROOT / "codex-skills"
+CODEX_AGENTS_DIR = REPO_ROOT / ".codex" / "agents"
 
 GENERATED_HEADER = (
     "<!-- Generated from specs/agents.yaml by scripts/generate-agent-kit.py. "
@@ -44,7 +47,7 @@ def load_spec() -> dict:
 
 
 def render_body(agent: dict, defaults: dict, *, title: str | None) -> str:
-    """Render the shared body: optional H1 title, identity, role, sections, note."""
+    """Render the shared body: optional H1 title, identity, role, sections, notes."""
     specialist_name = agent.get("specialist_name", defaults.get("specialist_name", "TODO"))
     parts: list[str] = []
 
@@ -59,6 +62,11 @@ def render_body(agent: dict, defaults: dict, *, title: str | None) -> str:
     for section in agent.get("sections", []):
         parts.append(f"## {section['heading']}")
         parts.append(section["body"].strip())
+
+    memory_note = defaults.get("shared_memory_note", "").strip()
+    if memory_note:
+        parts.append("## Shared Project Memory")
+        parts.append(memory_note)
 
     note = defaults.get("language_note", "").strip()
     if note:
@@ -89,26 +97,91 @@ def render_codex(agent: dict, defaults: dict) -> str:
     return f"{frontmatter}\n\n{GENERATED_HEADER}\n\n{body}"
 
 
+def toml_string(value: str) -> str:
+    return '"' + value.replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+
+def toml_multiline_string(value: str) -> str:
+    escaped = value.replace("\\", "\\\\").replace('"""', '\\"\\"\\"')
+    return f'"""\n{escaped}"""'
+
+
+def render_codex_agent(agent: dict, defaults: dict) -> str:
+    body = f"{GENERATED_HEADER}\n\n{render_body(agent, defaults, title=None)}"
+    return "\n".join(
+        [
+            f"name = {toml_string(agent['name'])}",
+            f"description = {toml_string(agent['description'])}",
+            f"developer_instructions = {toml_multiline_string(body)}",
+            "",
+        ]
+    )
+
+
 def write(path: Path, content: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(content, encoding="utf-8", newline="\n")
     print(f"  wrote {path.relative_to(REPO_ROOT)}")
 
 
+def expected_outputs(agent: dict, defaults: dict) -> dict[Path, str]:
+    name = agent["name"]
+    return {
+        CLAUDE_DIR / f"{name}.md": render_claude(agent, defaults),
+        CODEX_DIR / name / "SKILL.md": render_codex(agent, defaults),
+        CODEX_AGENTS_DIR / f"{name}.toml": render_codex_agent(agent, defaults),
+    }
+
+
+def check_outputs(outputs: dict[Path, str]) -> int:
+    stale: list[Path] = []
+    for path, expected in outputs.items():
+        if not path.exists() or path.read_text(encoding="utf-8") != expected:
+            stale.append(path)
+
+    if stale:
+        print("Generated agent files are out of sync. Run: python scripts/generate-agent-kit.py")
+        for path in stale:
+            print(f"  stale: {path.relative_to(REPO_ROOT)}")
+        return 1
+
+    print(f"OK: {len(outputs)} generated files are in sync with {SPEC_PATH.relative_to(REPO_ROOT)}.")
+    return 0
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Generate the Domus Agents kit.")
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="Verify generated files are current without writing them.",
+    )
+    return parser.parse_args()
+
+
 def main() -> int:
+    args = parse_args()
     spec = load_spec()
     defaults = spec.get("defaults", {})
     agents = spec.get("agents", [])
     if not agents:
         sys.exit("No agents found in specs/agents.yaml")
 
-    print(f"Generating {len(agents)} agents from {SPEC_PATH.relative_to(REPO_ROOT)}")
+    outputs: dict[Path, str] = {}
     for agent in agents:
-        name = agent["name"]
-        write(CLAUDE_DIR / f"{name}.md", render_claude(agent, defaults))
-        write(CODEX_DIR / name / "SKILL.md", render_codex(agent, defaults))
+        outputs.update(expected_outputs(agent, defaults))
 
-    print(f"Done. {len(agents)} Claude agents and {len(agents)} Codex skills generated.")
+    if args.check:
+        return check_outputs(outputs)
+
+    print(f"Generating {len(agents)} agents from {SPEC_PATH.relative_to(REPO_ROOT)}")
+    for path, content in outputs.items():
+        write(path, content)
+
+    print(
+        f"Done. {len(agents)} Claude agents, {len(agents)} Codex skills, "
+        f"and {len(agents)} Codex agents generated."
+    )
     return 0
 
 

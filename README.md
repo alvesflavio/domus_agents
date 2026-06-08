@@ -6,9 +6,10 @@ It includes a lean startup-style agent team with:
 
 - A default coordinator/router for complex work
 - Product, architecture, UX/UI, copy, security, DevOps, planning, task ops, code review, and debugging specialists
-- **Both Claude Code subagents AND Codex skills**, fully synchronized
+- **Claude Code subagents, Codex skills, and Codex agents**, fully synchronized
 - Per-agent model selection (Opus for complex, Sonnet for general, Haiku for simple)
 - A shared token-efficiency protocol
+- Project-local shared memory for Claude/Codex handoffs
 - Automatic deployment via git hooks
 - A `specialist_name: TODO` field in every agent so each specialist can receive a character/person name without changing its technical routing name
 
@@ -18,8 +19,11 @@ It includes a lean startup-style agent team with:
 - `specs/token-efficiency.md`: shared context and token budget protocol.
 - `claude-agents/*.md`: Claude Code subagents (generated).
 - `codex-skills/*/SKILL.md`: Codex skills (generated).
-- `scripts/generate-agent-kit.py`: generates both platform outputs from `specs/agents.yaml`.
+- `.codex/agents/*.toml`: Codex agents (generated).
+- `scripts/generate-agent-kit.py`: generates all platform outputs from `specs/agents.yaml`.
 - `scripts/validate-agent-kit.ps1`: local validation, including cross-platform description parity.
+- `scripts/init-shared-memory.ps1`: initializes project-local Claude/Codex shared memory.
+- `SHARED-MEMORY.md`: shared memory protocol and handoff format.
 - `INSTALL.md`: installation instructions.
 
 ## Uniform Claude + Codex
@@ -55,9 +59,21 @@ For full details, see `AUTOMATION.md`.
 ## Two Platforms
 
 - **Claude Code**: Agents available via `@agent-name` (globally installed)
-- **Codex**: Skills available via `/skill-name` (fully synchronized)
+- **Codex**: Agents available globally plus skills available via `/skill-name` (fully synchronized)
 
 Both platforms stay in sync automatically. See `CODEX-INTEGRATION.md` for Codex setup.
+
+## Shared Memory
+
+To let Claude Code and Codex agents see each other's last action inside a project, initialize Domus shared memory in that project:
+
+```powershell
+powershell -File scripts\init-shared-memory.ps1 -ProjectRoot C:\path\to\project
+```
+
+This creates `AGENTS.md`, `CLAUDE.md`, and `.domus/memory/`. Agents use `.domus/memory/handoffs.md` as the cross-platform action log and `.domus/memory/shared.md` for durable project facts. See `SHARED-MEMORY.md`.
+
+For token efficiency, shared memory is initialized on demand by `workstyle-standards-coordinator` or by the script above. Other specialists consume existing memory instead of checking and creating the structure on every task.
 
 ## Naming Characters
 

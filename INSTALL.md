@@ -8,6 +8,8 @@ This kit keeps one canonical agent spec and provides platform-specific files for
 - `specs/token-efficiency.md`: shared token/context budget protocol.
 - `claude-agents/*.md`: Claude Code subagents.
 - `codex-skills/*/SKILL.md`: Codex skills with equivalent behavior.
+- `.codex/agents/*.toml`: Codex agents with equivalent behavior.
+- `scripts/init-shared-memory.ps1`: initializes project-local shared memory for Claude/Codex handoffs.
 
 ## Included Agents
 
@@ -48,9 +50,29 @@ User scope:
 ```powershell
 New-Item -ItemType Directory -Force -Path "$HOME\.codex\skills"
 Copy-Item -Recurse outputs\portable-agent-kit\codex-skills\* "$HOME\.codex\skills\"
+New-Item -ItemType Directory -Force -Path "$HOME\.codex\agents"
+Copy-Item outputs\portable-agent-kit\.codex\agents\*.toml "$HOME\.codex\agents\"
 ```
 
-Then start a new Codex session so the skills are discoverable.
+Then start a new Codex session so the agents and skills are discoverable.
+
+## Initialize Shared Memory In A Project
+
+Run this inside each project where Claude Code and Codex agents should see each other's last action and handoffs:
+
+```powershell
+powershell -File scripts\init-shared-memory.ps1 -ProjectRoot C:\path\to\project
+```
+
+This creates or updates:
+
+- `AGENTS.md`: shared project instructions for Codex and other agents.
+- `CLAUDE.md`: imports `AGENTS.md` for Claude Code.
+- `.domus/memory/shared.md`: durable project facts and decisions.
+- `.domus/memory/handoffs.md`: latest agent actions, blockers, and next assignments.
+- `.domus/memory/agents/`: optional per-specialist memory.
+
+Restart Claude Code and Codex sessions in that project after initialization.
 
 ## Add Or Edit An Agent
 
