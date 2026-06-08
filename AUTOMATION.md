@@ -1,6 +1,6 @@
 # Automatic Agent Deployment
 
-This project includes full automation for keeping Claude Code and Codex agents in sync.
+This project includes full automation for keeping Claude Code, Codex, and Antigravity agents in sync.
 
 ## How It Works
 
@@ -143,5 +143,5 @@ If the hook fails:
 
 - **Do not edit** `claude-agents/*.md`, `codex-skills/*/SKILL.md`, or `.codex/agents/*.toml` by hand; they are generated.
 - **Always edit** `specs/agents.yaml` as the source of truth.
-- **One spec, two platforms:** Same description and body, platform-specific wrapper.
+- **One spec, three platforms:** Same description and body, platform-specific wrapper.
 - Automation is optional; you can always run scripts manually if needed.

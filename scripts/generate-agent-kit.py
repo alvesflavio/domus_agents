@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 """Generate the Domus Agents kit from the canonical spec.
 
-Reads specs/agents.yaml and writes both platform outputs so Claude Code and
-Codex stay uniform:
+Reads specs/agents.yaml and writes all platform outputs so Claude Code,
+Codex, and Antigravity stay uniform:
 
-  - claude-agents/<name>.md        Claude Code subagents
-  - codex-skills/<name>/SKILL.md   Codex skills
-  - .codex/agents/<name>.toml      Codex agents
+  - claude-agents/<name>.md             Claude Code subagents
+  - codex-skills/<name>/SKILL.md        Codex skills
+  - .codex/agents/<name>.toml           Codex agents
+  - antigravity-agents/<name>.md        Antigravity agents
 
 The body (identity + sections + language note) is identical across platforms.
 Only the frontmatter differs, because each platform requires a different shape:
 
-  - Claude frontmatter: name, description, tools, model
-  - Codex frontmatter:  name, description   (plus an H1 title in the body)
+  - Claude frontmatter:       name, description, tools, model
+  - Codex frontmatter:        name, description   (plus an H1 title in the body)
+  - Antigravity frontmatter:  name, description, model, platform: antigravity
 
 Run from the repo root:
     python scripts/generate-agent-kit.py
@@ -34,6 +36,7 @@ SPEC_PATH = REPO_ROOT / "specs" / "agents.yaml"
 CLAUDE_DIR = REPO_ROOT / "claude-agents"
 CODEX_DIR = REPO_ROOT / "codex-skills"
 CODEX_AGENTS_DIR = REPO_ROOT / ".codex" / "agents"
+ANTIGRAVITY_DIR = REPO_ROOT / "antigravity-agents"
 
 GENERATED_HEADER = (
     "<!-- Generated from specs/agents.yaml by scripts/generate-agent-kit.py. "
@@ -106,6 +109,21 @@ def toml_multiline_string(value: str) -> str:
     return f'"""\n{escaped}"""'
 
 
+def render_antigravity(agent: dict, defaults: dict) -> str:
+    model = agent.get("model", defaults.get("model", "inherit"))
+    lines = [
+        "---",
+        f"name: {agent['name']}",
+        f"description: {agent['description']}",
+        f"model: {model}",
+        "platform: antigravity",
+        "---",
+    ]
+    frontmatter = "\n".join(lines)
+    body = render_body(agent, defaults, title=None)
+    return f"{frontmatter}\n\n{GENERATED_HEADER}\n\n{body}"
+
+
 def render_codex_agent(agent: dict, defaults: dict) -> str:
     body = f"{GENERATED_HEADER}\n\n{render_body(agent, defaults, title=None)}"
     return "\n".join(
@@ -130,6 +148,7 @@ def expected_outputs(agent: dict, defaults: dict) -> dict[Path, str]:
         CLAUDE_DIR / f"{name}.md": render_claude(agent, defaults),
         CODEX_DIR / name / "SKILL.md": render_codex(agent, defaults),
         CODEX_AGENTS_DIR / f"{name}.toml": render_codex_agent(agent, defaults),
+        ANTIGRAVITY_DIR / f"{name}.md": render_antigravity(agent, defaults),
     }
 
 
@@ -180,7 +199,7 @@ def main() -> int:
 
     print(
         f"Done. {len(agents)} Claude agents, {len(agents)} Codex skills, "
-        f"and {len(agents)} Codex agents generated."
+        f"{len(agents)} Codex agents, and {len(agents)} Antigravity agents generated."
     )
     return 0
 

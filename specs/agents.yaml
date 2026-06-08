@@ -1,9 +1,10 @@
 # Canonical source of truth for the Domus Agents kit.
 #
-# Both platform outputs are generated from this file:
+# All platform outputs are generated from this file:
 #   - claude-agents/<name>.md        (Claude Code subagents)
 #   - codex-skills/<name>/SKILL.md   (Codex skills)
 #   - .codex/agents/<name>.toml      (Codex agents)
+#   - antigravity-agents/<name>.md   (Antigravity agents)
 #
 # Run: python scripts/generate-agent-kit.py
 #
@@ -28,7 +29,7 @@ defaults:
   model: claude-sonnet-4-6
   specialist_name: TODO
   shared_memory_note: |
-    When the current project contains `.domus/memory/`, treat it as the shared memory layer between Claude Code and Codex agents.
+    When the current project contains `.domus/memory/`, treat it as the shared memory layer between Claude Code, Codex, and Antigravity agents.
 
     Before starting delegated, cross-agent, continuation, coordination, planning, review, or debugging work, read:
 
