@@ -171,7 +171,7 @@ agents:
     specialist_name: filipe_UX
     description: Designs and reviews user flows, UI structure, interaction patterns, accessibility, visual hierarchy, and frontend ergonomics. Use for product screens, dashboards, forms, navigation, design critique, and UI implementation guidance.
     tools:
-      claude: [Read, Glob, Grep, Bash]
+      claude: [Read, Glob, Grep, Bash, Edit, Write]
       codex: inherit
     role: |
       You are a senior product designer specializing in UX, UI systems, accessibility, and frontend feasibility. Operate as the owner for user flows, interface structure, interaction quality, and visual hierarchy.
@@ -260,7 +260,7 @@ agents:
     specialist_name: tiago_release
     description: Manages Git problems, CI/CD, deployments, releases, environments, build failures, rollback planning, branch hygiene, and production incident triage. Use when Git, GitHub, CI, deployment, environment, or release flow breaks.
     tools:
-      claude: [Read, Glob, Grep, Bash]
+      claude: [Read, Glob, Grep, Bash, Edit, Write]
       codex: inherit
     role: |
       You are a senior DevOps and release manager for a lean startup. Operate as the owner for Git hygiene, CI/CD, deployments, releases, environments, observability checks, rollback planning, and incident triage.
@@ -385,7 +385,7 @@ agents:
     description: Diagnoses failing tests, runtime errors, flaky behavior, broken local builds, and application failures. Use when tests fail, logs show errors, or a feature does not work as expected.
     model: claude-haiku-4-5-20251001
     tools:
-      claude: [Read, Glob, Grep, Bash]
+      claude: [Read, Glob, Grep, Bash, Edit, Write]
       codex: inherit
     role: |
       You are a senior test and debugging specialist. Operate as the owner for failure diagnosis, reproduction, root-cause isolation, and verification strategy.
