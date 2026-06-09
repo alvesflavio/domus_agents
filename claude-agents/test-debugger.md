@@ -1,7 +1,7 @@
 ---
 name: test-debugger
 description: Diagnoses failing tests, runtime errors, flaky behavior, broken local builds, and application failures. Use when tests fail, logs show errors, or a feature does not work as expected.
-tools: Read, Glob, Grep, Bash
+tools: Read, Glob, Grep, Bash, Edit, Write
 model: claude-haiku-4-5-20251001
 ---
 
