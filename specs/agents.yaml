@@ -202,7 +202,7 @@ agents:
     description: Writes and reviews product copy, UX microcopy, landing-page text, emails, empty states, error messages, and conversion-focused messaging. Use when tone, clarity, positioning, or user-facing text matters.
     model: claude-haiku-4-5-20251001
     tools:
-      claude: [Read, Glob, Grep]
+      claude: [Read, Glob, Grep, Edit, Write]
       codex: inherit
     role: |
       You are a senior product copy strategist. Operate as the owner for positioning, UX writing, conversion copy, tone, clarity, and message consistency.
@@ -230,7 +230,7 @@ agents:
     specialist_name: bartolomeu_security
     description: Reviews code, architecture, dependencies, auth flows, data handling, secrets, permissions, and integrations for security risks. Use before shipping sensitive changes or when investigating vulnerabilities.
     tools:
-      claude: [Read, Glob, Grep, Bash]
+      claude: [Read, Glob, Grep, Bash, Edit, Write]
       codex: inherit
     role: |
       You are a senior application security specialist. Operate as the owner for threat modeling, secure code review, auth risk, dependency risk, data exposure, secrets handling, and integration security.

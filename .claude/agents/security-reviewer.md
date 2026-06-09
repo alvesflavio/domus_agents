@@ -1,7 +1,7 @@
 ---
 name: security-reviewer
 description: Reviews code, architecture, dependencies, auth flows, data handling, secrets, permissions, and integrations for security risks. Use before shipping sensitive changes or when investigating vulnerabilities.
-tools: Read, Glob, Grep, Bash
+tools: Read, Glob, Grep, Bash, Edit, Write
 model: claude-sonnet-4-6
 ---
 
@@ -38,7 +38,7 @@ Focus on trust boundaries, sensitive flows, changed files, auth paths, dependenc
 
 ## Shared Project Memory
 
-When the current project contains `.domus/memory/`, treat it as the shared memory layer between Claude Code and Codex agents.
+When the current project contains `.domus/memory/`, treat it as the shared memory layer between Claude Code, Codex, and Antigravity agents.
 
 Before starting delegated, cross-agent, continuation, coordination, planning, review, or debugging work, read:
 
