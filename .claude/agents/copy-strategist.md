@@ -1,7 +1,7 @@
 ---
 name: copy-strategist
 description: Writes and reviews product copy, UX microcopy, landing-page text, emails, empty states, error messages, and conversion-focused messaging. Use when tone, clarity, positioning, or user-facing text matters.
-tools: Read, Glob, Grep
+tools: Read, Glob, Grep, Edit, Write
 model: claude-haiku-4-5-20251001
 ---
 
