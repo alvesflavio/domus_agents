@@ -34,6 +34,7 @@ except ImportError:  # pragma: no cover
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SPEC_PATH = REPO_ROOT / "specs" / "agents.yaml"
 CLAUDE_DIR = REPO_ROOT / "claude-agents"
+CLAUDE_CODE_DIR = REPO_ROOT / ".claude" / "agents"
 CODEX_DIR = REPO_ROOT / "codex-skills"
 CODEX_AGENTS_DIR = REPO_ROOT / ".codex" / "agents"
 ANTIGRAVITY_DIR = REPO_ROOT / "antigravity-agents"
@@ -144,8 +145,10 @@ def write(path: Path, content: str) -> None:
 
 def expected_outputs(agent: dict, defaults: dict) -> dict[Path, str]:
     name = agent["name"]
+    claude_content = render_claude(agent, defaults)
     return {
-        CLAUDE_DIR / f"{name}.md": render_claude(agent, defaults),
+        CLAUDE_DIR / f"{name}.md": claude_content,
+        CLAUDE_CODE_DIR / f"{name}.md": claude_content,
         CODEX_DIR / name / "SKILL.md": render_codex(agent, defaults),
         CODEX_AGENTS_DIR / f"{name}.toml": render_codex_agent(agent, defaults),
         ANTIGRAVITY_DIR / f"{name}.md": render_antigravity(agent, defaults),
@@ -198,8 +201,9 @@ def main() -> int:
         write(path, content)
 
     print(
-        f"Done. {len(agents)} Claude agents, {len(agents)} Codex skills, "
-        f"{len(agents)} Codex agents, and {len(agents)} Antigravity agents generated."
+        f"Done. {len(agents)} Claude agents (claude-agents/ + .claude/agents/), "
+        f"{len(agents)} Codex skills, {len(agents)} Codex agents, "
+        f"and {len(agents)} Antigravity agents generated."
     )
     return 0
 
