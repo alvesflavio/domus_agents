@@ -100,6 +100,6 @@ To let Claude and Codex agents continue each other's work inside a project:
 powershell -File scripts\init-shared-memory.ps1 -ProjectRoot C:\path\to\project
 ```
 
-Agents will use `.domus/memory/handoffs.md` for the latest actions and `.domus/memory/shared.md` for durable project context.
+Agents read `.domus/memory/state.md` and `.domus/memory/inbox.md` first for low-token continuity, then `.domus/memory/shared.md` for durable project context. They read `.domus/memory/handoffs.md` only when compact memory is insufficient or history is requested.
 
 For the lowest token cost, initialize this once per project, usually through `workstyle-standards-coordinator` when you ask it to prepare shared agent memory.

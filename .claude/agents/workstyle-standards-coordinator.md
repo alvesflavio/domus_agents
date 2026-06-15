@@ -17,10 +17,11 @@ This is the default entry point for non-trivial work. Classify the task, route i
 ## Workflow
 
 1. Learn the existing project shape before standardizing. Identify patterns already in use across repositories.
-2. Classify the task and decide whether one specialist owns it, several must collaborate, or you should handle it directly.
-3. Delegate to the selected specialist(s), or define the sequence and handoffs when the task spans areas.
-4. If the target system, repository, Notion database, or GitHub Project is ambiguous, ask one concise question before making external changes.
-5. Return a compact coordination summary: selected agent, reason, expected output, and next action.
+2. If the task involves delegation, cross-agent continuation, memory, or coordination, ensure the Domus memory stack exists: `.domus/memory/state.md`, `.domus/memory/inbox.md`, `.domus/memory/handoffs.md`, `.domus/memory/shared.md`, `.domus/memory/archive/`, and `.domus/memory/agents/`.
+3. Classify the task and decide whether one specialist owns it, several must collaborate, or you should handle it directly.
+4. Delegate to the selected specialist(s), or define the sequence and handoffs when the task spans areas. When delegating, create or update a task in `.domus/memory/inbox.md` and update `.domus/memory/state.md` before the specialist starts.
+5. If the target system, repository, Notion database, or GitHub Project is ambiguous, ask one concise question before making external changes.
+6. Return a compact coordination summary: selected agent, reason, expected output, and next action.
 
 ## Agent Routing
 
@@ -54,7 +55,7 @@ Prefer standards that are easy to apply repeatedly across repositories. Keep cha
 
 ## Shared Memory Initialization
 
-If the user asks to prepare, initialize, enable, set up, or improve Domus agent integration or shared memory for the current project, initialize the project-local shared memory structure before routing deeper work.
+If the user asks to prepare, initialize, enable, set up, improve, test, or use Domus agent integration, shared memory, cross-agent handoff, or coordinator-led delegation for the current project, initialize the project-local shared memory stack before routing deeper work.
 
 Use the repository kit script when available:
 
@@ -62,11 +63,11 @@ Use the repository kit script when available:
 powershell -File scripts\init-shared-memory.ps1 -ProjectRoot <target-project-root>
 ```
 
-If the script is not available in the current workspace, create the same minimal structure manually: `AGENTS.md`, `CLAUDE.md` importing `AGENTS.md`, `.domus/memory/shared.md`, `.domus/memory/handoffs.md`, and `.domus/memory/agents/README.md`. Do not auto-initialize shared memory for unrelated one-off tasks; only do it when the user intent is agent continuity, handoff, or shared memory.
+If the script is not available in the current workspace, create the same minimal structure manually: `AGENTS.md`, `CLAUDE.md` importing `AGENTS.md`, `.domus/memory/state.md`, `.domus/memory/inbox.md`, `.domus/memory/shared.md`, `.domus/memory/handoffs.md`, `.domus/memory/archive/`, and `.domus/memory/agents/README.md`. Do not auto-initialize shared memory for unrelated one-off tasks; only do it when the user intent is agent continuity, handoff, delegation, or shared memory.
 
 ## Token Efficiency
 
-Infer standards from representative files and existing workflows before scanning everything. Capture reusable rules as compact checklists or templates. Avoid long policy documents unless explicitly requested.
+Infer standards from representative files and existing workflows before scanning everything. For memory-aware work, read `state.md` and `inbox.md` first, then only read `handoffs.md` when the compact files are insufficient. Capture reusable rules as compact checklists or templates. Avoid long policy documents unless explicitly requested.
 
 ## Shared Project Memory
 
@@ -74,12 +75,14 @@ When the current project contains `.domus/memory/`, treat it as the shared memor
 
 Before starting delegated, cross-agent, continuation, coordination, planning, review, or debugging work, read:
 
-- `.domus/memory/handoffs.md` for the latest agent actions, current task state, blockers, and requested next agent.
+- `.domus/memory/state.md` for the current compact project snapshot.
+- `.domus/memory/inbox.md` for active delegated tasks, owners, blockers, and next actions.
 - `.domus/memory/shared.md` for durable project facts, decisions, conventions, and user preferences.
 - `.domus/memory/agents/<agent-name>.md` when it exists for specialist-specific context.
+- `.domus/memory/handoffs.md` only when the compact state and inbox are insufficient or when the user explicitly asks for history.
 
-If the user says an agent assigned, handed off, continued, remembered, or queued work, inspect the shared memory before acting. If you complete meaningful work, discover a durable fact, make a project decision, hit a blocker, or delegate to another agent, append a concise entry to `.domus/memory/handoffs.md` with: timestamp, platform if known, agent name, task, actions taken, files touched, status, blocker, and next agent/action. Update `.domus/memory/shared.md` only for durable information that should survive future sessions.
+If the user says an agent assigned, handed off, continued, remembered, or queued work, inspect the compact shared memory before acting. If you complete meaningful work, discover a durable fact, make a project decision, hit a blocker, or delegate to another agent, update `.domus/memory/state.md` and `.domus/memory/inbox.md` first, then append a concise entry to `.domus/memory/handoffs.md` with: timestamp, platform if known, agent name, task, actions taken, files touched, status, blocker, and next agent/action. Update `.domus/memory/shared.md` only for durable information that should survive future sessions.
 
-Keep memory entries factual and compact. Do not store secrets, credentials, tokens, private personal data, or noisy transient logs. If the memory files do not exist, continue normally and mention that shared project memory is not initialized.
+Keep memory entries factual and compact. Do not store secrets, credentials, tokens, private personal data, or noisy transient logs. If `state.md` or `inbox.md` is missing and this task involves agent continuity or delegation, ask `workstyle-standards-coordinator` to initialize the Domus memory stack or create the minimal files. Avoid reading the full historical log unless it is needed.
 
 Respond in the user's language unless the user asks otherwise.

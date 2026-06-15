@@ -23,9 +23,24 @@ The script creates or updates:
 
 - `AGENTS.md`: shared instructions loaded by Codex and imported by Claude.
 - `CLAUDE.md`: imports `AGENTS.md` for Claude Code.
+- `.domus/memory/state.md`: compact current project snapshot for low-token continuity.
+- `.domus/memory/inbox.md`: active delegated task queue with owners, blockers, and expected outputs.
 - `.domus/memory/shared.md`: durable facts, decisions, conventions, and explicit user preferences.
 - `.domus/memory/handoffs.md`: chronological agent action and delegation log.
+- `.domus/memory/archive/`: old handoff chunks when history needs rotation.
 - `.domus/memory/agents/`: optional specialist-specific memory files.
+
+## Low-Token Read Order
+
+Agents should not read the full history by default. For delegated, cross-agent, continuation, coordination, planning, review, or debugging work, read in this order:
+
+1. `.domus/memory/state.md`
+2. `.domus/memory/inbox.md`
+3. `.domus/memory/shared.md`
+4. `.domus/memory/agents/<agent-name>.md` when it exists
+5. `.domus/memory/handoffs.md` only when the compact files are insufficient or the user asks for history
+
+`workstyle-standards-coordinator` owns the stack. When it is invoked for delegation, cross-agent continuation, or memory setup, it should ensure the files above exist, create/update a task in `inbox.md`, and update `state.md` before routing work to a specialist.
 
 ## Handoff Contract
 
@@ -58,10 +73,11 @@ Example:
 
 All generated Domus agents include the same shared-memory instruction:
 
-- Read `.domus/memory/handoffs.md` before delegated, cross-agent, continuation, coordination, planning, review, or debugging work.
+- Read `.domus/memory/state.md` and `.domus/memory/inbox.md` before delegated, cross-agent, continuation, coordination, planning, review, or debugging work.
 - Read `.domus/memory/shared.md` for durable project context.
 - Read `.domus/memory/agents/<agent-name>.md` when agent-specific context exists.
-- Append to `handoffs.md` after meaningful work, blockers, decisions, or delegation.
+- Read `.domus/memory/handoffs.md` only when compact memory is insufficient or historical audit is requested.
+- Update `state.md` and `inbox.md` before appending to `handoffs.md` after meaningful work, blockers, decisions, or delegation.
 - Update `shared.md` only for durable information.
 
 Only `workstyle-standards-coordinator` owns initialization. When the user asks to prepare or enable shared memory for a project, the coordinator should run `scripts\init-shared-memory.ps1` for the target project, or create the same minimal structure manually if the script is unavailable. Other specialists should use the memory when it exists, but should not initialize it for unrelated one-off tasks.

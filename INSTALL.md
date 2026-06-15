@@ -69,8 +69,11 @@ This creates or updates:
 
 - `AGENTS.md`: shared project instructions for Codex and other agents.
 - `CLAUDE.md`: imports `AGENTS.md` for Claude Code.
+- `.domus/memory/state.md`: compact current project snapshot for low-token continuity.
+- `.domus/memory/inbox.md`: active delegated task queue.
 - `.domus/memory/shared.md`: durable project facts and decisions.
 - `.domus/memory/handoffs.md`: latest agent actions, blockers, and next assignments.
+- `.domus/memory/archive/`: old handoff chunks when history needs rotation.
 - `.domus/memory/agents/`: optional per-specialist memory.
 
 Restart Claude Code and Codex sessions in that project after initialization.
@@ -114,3 +117,5 @@ specialist_name: TODO
 ```
 
 Replace `TODO` with the character/person name you want to use. Keep the technical `name` unchanged because Claude and Codex use it for routing.
+
+The generated Codex agent TOML files also include `display_name = "<specialist_name>"` as an experimental UI hint. Codex Desktop may ignore this field if the current runtime does not support custom Subagents display names.

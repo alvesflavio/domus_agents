@@ -77,6 +77,8 @@ This creates `AGENTS.md`, `CLAUDE.md`, and `.domus/memory/`. Agents use `.domus/
 
 For token efficiency, shared memory is initialized on demand by `workstyle-standards-coordinator` or by the script above. Other specialists consume existing memory instead of checking and creating the structure on every task.
 
+The memory stack is optimized for low token usage: agents read `.domus/memory/state.md` and `.domus/memory/inbox.md` first, use `.domus/memory/shared.md` for durable context, and only open the full `.domus/memory/handoffs.md` history when the compact files are insufficient or history is explicitly requested.
+
 ## Naming Characters
 
 Each agent includes:
@@ -86,6 +88,8 @@ specialist_name: TODO
 ```
 
 Set `defaults.specialist_name` to apply the same character name to every agent, or set `specialist_name` on one agent to override only that specialist. Keep the technical `name` unchanged because Claude and Codex use it for routing.
+
+For Codex agent TOML files, the generator also writes `display_name = "<specialist_name>"` as an experimental UI hint. Keep `name` stable; whether `display_name` appears in Codex Desktop's Subagents list depends on Codex Desktop support for that field.
 
 ## Apostolic Persona Map
 

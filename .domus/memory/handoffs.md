@@ -4,6 +4,69 @@ Append newest entries at the top of the log. Keep entries compact and factual.
 
 ## Log
 
+### 2026-06-09T02:40:48Z | platform: Codex | agent: workstyle-standards-coordinator
+
+- Task: Implement low-token Domus memory stack and deploy updated agents globally.
+- Actions: Added compact memory files `state.md`, `inbox.md`, and `archive/`; updated shared memory instructions so agents read compact state/inbox before historical handoffs; made `workstyle-standards-coordinator` responsible for stack initialization and task queue updates when invoked for delegation or shared memory; regenerated and validated all generated agents; installed updated Claude and Codex agents globally and copied Antigravity agents globally; initialized the stack in `C:\dev\domus_agents` and `C:\dev\doulus_ai`.
+- Files touched: `specs/agents.yaml`, `scripts/init-shared-memory.ps1`, `AGENTS.md`, `README.md`, `INSTALL.md`, `QUICK-START.md`, `SHARED-MEMORY.md`, generated agent outputs, `.domus/memory/state.md`, `.domus/memory/inbox.md`, `.domus/memory/archive/README.md`, `.domus/memory/shared.md`, `.domus/memory/handoffs.md`.
+- Status: done.
+- Blocker: None.
+- Next agent/action: Restart Claude Code, Codex, and Antigravity sessions so the globally installed agents load the new compact memory protocol.
+
+### 2026-06-08T00:00:00Z | platform: Claude Code | agent: pedro_CTO (workstyle-standards-coordinator)
+
+- Task: Confirmar a validacao da memoria Domus compartilhada e os nomes dos 11 agentes registrados pelo Codex.
+- Actions: Li a entrada mais recente do Codex (`2026-06-09T02:09:03Z`) e validei o roster completo. Os 11 agentes confirmados (tecnico -> persona): `workstyle-standards-coordinator` -> pedro_CTO; `product-strategist` -> andre_produto; `software-architect` -> joao_arquiteto; `ux-ui-designer` -> filipe_UX; `copy-strategist` -> judas_tadeu_copy; `security-reviewer` -> bartolomeu_security; `devops-release-manager` -> tiago_release; `task-ops-manager` -> mateus_ops; `implementation-planner` -> tiago_planner; `code-reviewer` -> tome_reviewer; `test-debugger` -> simao_debugger.
+- Files touched: `.domus/memory/handoffs.md`.
+- Status: done.
+- Blocker: None.
+- Next agent/action: Continuidade Codex <-> Claude Code validada com sucesso; nenhuma acao pendente.
+
+### 2026-06-09T02:09:03Z | platform: Codex | agent: workstyle-standards-coordinator
+
+- Task: Validate shared Domus memory with all registered agents.
+- Actions: Registered the full agent roster for Claude Code validation: `workstyle-standards-coordinator` -> `pedro_CTO`; `product-strategist` -> `andre_produto`; `software-architect` -> `joao_arquiteto`; `ux-ui-designer` -> `filipe_UX`; `copy-strategist` -> `judas_tadeu_copy`; `security-reviewer` -> `bartolomeu_security`; `devops-release-manager` -> `tiago_release`; `task-ops-manager` -> `mateus_ops`; `implementation-planner` -> `tiago_planner`; `code-reviewer` -> `tome_reviewer`; `test-debugger` -> `simao_debugger`.
+- Files touched: `.domus/memory/handoffs.md`.
+- Status: done.
+- Blocker: None.
+- Next agent/action: User will ask Claude Code to read the latest Domus memory entry and confirm all 11 agents are present.
+
+### 2026-06-09T02:05:26Z | platform: Codex | agent: workstyle-standards-coordinator
+
+- Task: Test shared Domus memory visibility between Codex and Claude Code.
+- Actions: Registered this deliberate test entry so the user can open Claude Code and ask for the latest memory record.
+- Files touched: `.domus/memory/handoffs.md`.
+- Status: done.
+- Blocker: None.
+- Next agent/action: User will ask Claude Code what the latest Domus memory entry is; Claude should report this timestamp and task.
+
+### 2026-06-09T02:02:13Z | platform: Codex | agent: Codex
+
+- Task: Run the latest Domus agents update across projects.
+- Actions: Regenerated and validated the kit; installed Claude agents globally to `$HOME\.claude\agents`; installed Codex skills/agents globally to `$HOME\.codex`; copied Antigravity agents to `$HOME\.antigravity\agents`; updated local `.claude\agents` copies in existing Domus projects `C:\dev\domus_agents` and `C:\dev\doulus_ai`.
+- Files touched: Global user agent directories; local `.claude\agents` in `C:\dev\doulus_ai`; generated files in this repo from regeneration; `.domus/memory/handoffs.md`.
+- Status: done.
+- Blocker: Codex Desktop may still ignore `display_name`; requires restart/new session to verify.
+- Next agent/action: Restart Claude Code, Codex Desktop/session, and Antigravity sessions to reload global agents.
+
+### 2026-06-09T01:47:10Z | platform: Codex | agent: Codex
+
+- Task: Replicate custom display names for all Codex agents.
+- Actions: Updated `scripts/generate-agent-kit.py` so every `.codex/agents/*.toml` includes `display_name = "<specialist_name>"`; regenerated all 11 agents; deployed updated Codex skills/agents to `$HOME\.codex`; documented the experimental UI hint in README and INSTALL; validated generated parity.
+- Files touched: `scripts/generate-agent-kit.py`, `.codex/agents/*.toml`, `README.md`, `INSTALL.md`, `.domus/memory/handoffs.md`.
+- Status: done.
+- Blocker: Codex Desktop may ignore `display_name` if the runtime does not support custom Subagents labels.
+- Next agent/action: Restart Codex Desktop/session and verify whether Subagents shows persona names; if ignored, the UI is runtime-controlled.
+
+### 2026-06-09T01:41:52Z | platform: Codex | agent: Codex
+
+- Task: Explore how user-defined agent names could appear in Codex Desktop Subagents UI.
+- Actions: Inspected generated `.codex/agents/*.toml`, `specs/agents.yaml`, and `scripts/generate-agent-kit.py`; discovered `specialist_name` is rendered only inside prompts and `display_name` is used only as Codex skill H1; checked available `multi_agent_v1.spawn_agent` schema and found no `display_name`/`label` parameter for visible subagent naming.
+- Files touched: `.domus/memory/handoffs.md`.
+- Status: done.
+- Blocker: Codex Desktop subagent UI naming appears controlled by runtime/tooling, not by generated agent prompt fields.
+- Next agent/action: If desired, add an experimental `display_name = "<specialist_name>"` or `alias = "<specialist_name>"` TOML field behind documentation, then manually verify whether Codex Desktop reads it.
+
 ### 2026-06-08T03:00:00Z | platform: Claude Code | agent: workstyle-standards-coordinator
 
 - Task: Add Antigravity platform support so agents stay uniform across Claude Code, Codex, and Antigravity.
@@ -66,3 +129,19 @@ Append newest entries at the top of the log. Keep entries compact and factual.
 - Status: pending | in-progress | blocked | done.
 - Blocker: None.
 - Next agent/action: `agent-name` should do the next concrete action.
+
+## 2026-06-09 — Claude Code (Opus) — agent usage tracker
+- Task: rastrear uso/eficiência/tokens de cada agent por projeto, sem custo de tokens.
+- Actions: criado `scripts/agent-usage.py` (collect incremental + report CLI); ingere transcripts do Claude Code (sessões + `subagents/agent-*.jsonl`, atribuição via agentId→agentType) e rollouts do Codex (`token_count`); grava em SQLite `~/.domus/usage.db`. Primeira coleta: 381 arquivos, 7 projetos Claude + ~20 projetos Codex.
+- Files: scripts/agent-usage.py (novo).
+- Status: fase 1 (manual) funcionando. Próximo: agendamento (Task Scheduler/hook SubagentStop) e fase 3 = app Streamlit com dashboard + criação/gestão de agents (decisão do usuário).
+
+## 2026-06-09 — Claude Code (Sonnet) — Domus Console: spec + automação + app
+- Task: doc de produto, fase 2 (automação), fase 3 (app Streamlit).
+- Actions:
+  - docs/domus-console-product-spec.md criado (visão de negócio, arquitetura, modelo de dados, 5 telas, requisitos UX, roadmap, riscos).
+  - Fase 2: scripts/setup-usage-automation.ps1 + tarefa "DomusUsageCollect" (schtasks, horária) + hook SubagentStop em ~/.claude/settings.json instalados.
+  - Fase 3: console/ com app.py (Streamlit multi-page), db.py (queries SQLite), pages/dashboard.py, agent_detail.py, project_detail.py, agent_manager.py, settings.py + requirements.txt.
+- Files: docs/domus-console-product-spec.md, scripts/setup-usage-automation.ps1, console/app.py, console/db.py, console/pages/*.py, console/requirements.txt
+- Status: código pronto. Dependências não instaladas (usuário interrompeu pip install — deve rodar manualmente). Nada commitado ainda.
+- Next: instalar deps (pip install -r console/requirements.txt) → testar UI → commit.

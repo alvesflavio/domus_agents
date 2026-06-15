@@ -127,9 +127,11 @@ def render_antigravity(agent: dict, defaults: dict) -> str:
 
 def render_codex_agent(agent: dict, defaults: dict) -> str:
     body = f"{GENERATED_HEADER}\n\n{render_body(agent, defaults, title=None)}"
+    specialist_name = agent.get("specialist_name", defaults.get("specialist_name", "TODO"))
     return "\n".join(
         [
             f"name = {toml_string(agent['name'])}",
+            f"display_name = {toml_string(specialist_name)}",
             f"description = {toml_string(agent['description'])}",
             f"developer_instructions = {toml_multiline_string(body)}",
             "",
