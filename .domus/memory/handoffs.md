@@ -4,6 +4,24 @@ Append newest entries at the top of the log. Keep entries compact and factual.
 
 ## Log
 
+### 2026-06-15T16:00:00Z | platform: Claude Code | agent: tome_reviewer
+
+- Task: Postgres compatibility review of scripts/agent-usage.py — four specific risk areas (file_changed row access, report() placeholder/params, clear_file_rows single-element tuple, transaction safety).
+- Actions: (1) Confirmed row[0]/row[1] in file_changed() is safe — psycopg3 fetchone() returns TupleRow, subscriptable by index. No change needed. (2) Confirmed ?->%s replacement in _postgres_sql() is correct for report() queries (max one ? per query, params is a list, psycopg3 accepts sequences). No change needed. (3) Confirmed (str(path),) 1-tuple in clear_file_rows() works correctly after ?->%s substitution. No change needed. (4) Found three transaction-safety bugs: (a) bare  in connect() migration loop leaves psycopg3 in InFailedSqlTransaction before the subsequent commit() — added con.rollback() in the except clause; (b) per-file block in collect() had no try/except, so any psycopg3 error (network drop, constraint) would kill the whole run with an unreadable error and leave ingested_files inconsistent — wrapped with try/except + con.rollback() + stderr warning; (c) DbCompat had no rollback() method — added it.
+- Files touched: scripts/agent-usage.py.
+- Status: done.
+- Blocker: None.
+- Next agent/action: None.
+
+### 2026-06-15T15:30:00Z | platform: Claude Code | agent: bartolomeu_security
+
+- Task: Security review of Domus Console (console/db.py, scripts/agent-usage.py, console/pages/agent_manager.py, .gitignore).
+- Actions: Reviewed all files for SQL injection, command injection, credential leakage, and .gitignore adequacy. Applied two high-severity fixes: (1) added `_sanitize_output()` in settings.py to strip DATABASE_URL/postgresql:// from subprocess stderr before st.error(); (2) added `_redact_url()` in db.py wrapping _one/_all/_df to strip connection strings from SQLAlchemy exception messages before they reach Streamlit's traceback renderer.
+- Files touched: console/db.py, console/pages/settings.py.
+- Status: done.
+- Blocker: None.
+- Next agent/action: None — three medium/low findings documented for optional remediation.
+
 ### 2026-06-09T02:40:48Z | platform: Codex | agent: workstyle-standards-coordinator
 
 - Task: Implement low-token Domus memory stack and deploy updated agents globally.
@@ -145,3 +163,11 @@ Append newest entries at the top of the log. Keep entries compact and factual.
 - Files: docs/domus-console-product-spec.md, scripts/setup-usage-automation.ps1, console/app.py, console/db.py, console/pages/*.py, console/requirements.txt
 - Status: código pronto. Dependências não instaladas (usuário interrompeu pip install — deve rodar manualmente). Nada commitado ainda.
 - Next: instalar deps (pip install -r console/requirements.txt) → testar UI → commit.
+# 2026-06-15T14:44:46Z | Codex | workstyle-standards-coordinator
+
+- Task: Create Neon Postgres project and integrate Domus Console localhost.
+- Actions taken: Read Domus memory; created Neon project `domus-agents`; applied Postgres schema; added local env loading; updated console DB layer for Neon/Postgres with SQLite fallback; updated collector for Postgres writes; added dependency declarations and ignored local env files; verified dashboard/settings through Streamlit at `http://127.0.0.1:8501`.
+- Files touched: `.domus/memory/state.md`, `.domus/memory/inbox.md`, `.domus/memory/shared.md`, `.domus/memory/handoffs.md`, `console/db.py`, `console/pages/settings.py`, `console/requirements.txt`, `scripts/agent-usage.py`, `.gitignore`, `.env.example`, `.env.local`.
+- Status: Done.
+- Blocker: None.
+- Next agent/action: Use `.env.local` for localhost; future agents must not commit or disclose the Neon connection string.

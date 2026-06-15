@@ -4,7 +4,8 @@ Durable project context shared by Claude Code and Codex agents.
 
 ## Project Facts
 
-- Add stable architecture, domain, workflow, and repository facts here.
+- Domus Console can use Neon Postgres when `DATABASE_URL` is set, while preserving the local SQLite fallback at `~/.domus/usage.db`.
+- Neon project for this repository: `domus-agents`, project ID `muddy-hat-61615284`, default database `neondb`, main branch `br-dark-block-aihzcp95`. Do not store the connection string or password in shared memory.
 
 ## Decisions
 

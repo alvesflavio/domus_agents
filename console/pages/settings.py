@@ -1,49 +1,65 @@
-"""Configurações — coleta, automação, caminhos."""
-import sys, subprocess
+"""Settings page: collection, automation, and data sources."""
+import json
+import os
+import re
+import subprocess
+import sys
 from pathlib import Path
+
+import pandas as pd
+import streamlit as st
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import streamlit as st
 import db
+
+
+def _sanitize_output(text: str) -> str:
+    """Remove DATABASE_URL value and any postgresql:// connection strings from
+    output that will be rendered in the UI, preventing credential leakage via
+    subprocess stderr or SQLAlchemy/psycopg tracebacks."""
+    db_url = os.getenv("DATABASE_URL", "")
+    if db_url:
+        text = text.replace(db_url, "[DATABASE_URL redacted]")
+    # Catch any residual postgresql(+psycopg)://user:pass@host/db patterns.
+    text = re.sub(
+        r"postgresql(?:\+\w+)?://[^\s\"']+",
+        "[connection string redacted]",
+        text,
+    )
+    return text
 
 ROOT = Path(__file__).parent.parent.parent
 COLLECTOR = ROOT / "scripts" / "agent-usage.py"
 
 
-def fmt_bytes(n):
-    if n >= 1_048_576: return f"{n/1_048_576:.1f} MB"
-    if n >= 1_024:     return f"{n/1_024:.1f} KB"
-    return f"{n} B"
+st.title("Configuracoes")
 
-
-st.title("Configurações")
-
-# ── status da coleta ──────────────────────────────────────────────────────────
 st.subheader("Status da coleta")
 
 info = db.last_collect_info()
 col1, col2, col3 = st.columns(3)
 col1.metric("Arquivos ingeridos", info.get("n", 0))
-col2.metric("Tamanho do banco",   fmt_bytes(info.get("db_size", 0)))
-col3.metric("Última ingestão", str(info.get("last") or "—")[:10])
+col2.metric("Backend", db.backend_label())
+col3.metric("Ultima ingestao", str(info.get("last") or "-")[:10])
+st.caption(f"Destino atual: `{db.database_location()}`")
 
-if st.button("🔄 Coletar agora", type="primary"):
-    import sys as _sys
+if st.button("Coletar agora", type="primary"):
     with st.spinner("Coletando..."):
         r = subprocess.run(
-            [_sys.executable, str(COLLECTOR), "collect"],
-            capture_output=True, text=True
+            [sys.executable, str(COLLECTOR), "collect"],
+            capture_output=True,
+            text=True,
         )
     if r.returncode == 0:
-        st.success(r.stdout.strip() or "Coleta concluída.")
-        st.cache_resource.clear()
+        st.success(r.stdout.strip() or "Coleta concluida.")
+        db.clear_cache()
     else:
-        st.error(f"Erro:\n{r.stderr}")
+        st.error(f"Erro:\n{_sanitize_output(r.stderr)}")
 
 st.divider()
 
-# ── automação ─────────────────────────────────────────────────────────────────
-st.subheader("Automação")
+st.subheader("Automacao")
 
 col_a, col_b = st.columns(2)
 
@@ -51,67 +67,73 @@ with col_a:
     st.markdown("**Task Scheduler (Windows)**")
     r = subprocess.run(
         ["schtasks", "/Query", "/TN", "DomusUsageCollect", "/FO", "LIST"],
-        capture_output=True, text=True
+        capture_output=True,
+        text=True,
     )
     if r.returncode == 0:
-        next_run = [l for l in r.stdout.splitlines() if "próxima" in l.lower() or "next" in l.lower()]
-        st.success("✅ Tarefa instalada — roda a cada hora.")
+        next_run = [
+            line
+            for line in r.stdout.splitlines()
+            if "proxima" in line.lower() or "next" in line.lower()
+        ]
+        st.success("Tarefa instalada - roda a cada hora.")
         if next_run:
             st.caption(next_run[0].strip())
     else:
-        st.warning("❌ Tarefa não instalada.")
+        st.warning("Tarefa nao instalada.")
         st.code("powershell -File scripts\\setup-usage-automation.ps1", language="powershell")
 
 with col_b:
     st.markdown("**Hook SubagentStop (Claude Code)**")
     settings_path = Path.home() / ".claude" / "settings.json"
+    hook_present = False
     if settings_path.exists():
-        import json
         try:
             cfg = json.loads(settings_path.read_text(encoding="utf-8"))
             hook_present = bool(cfg.get("hooks", {}).get("SubagentStop"))
         except Exception:
             hook_present = False
-    else:
-        hook_present = False
 
     if hook_present:
-        st.success("✅ Hook ativo — coleta ao fim de cada subagent.")
+        st.success("Hook ativo - coleta ao fim de cada subagent.")
     else:
-        st.warning("❌ Hook não instalado.")
+        st.warning("Hook nao instalado.")
         st.code("powershell -File scripts\\setup-usage-automation.ps1", language="powershell")
 
 st.divider()
 
-# ── fontes de dados ────────────────────────────────────────────────────────────
 st.subheader("Fontes de dados")
 
 sources = {
-    "Claude Code transcripts":   Path.home() / ".claude" / "projects",
-    "Codex sessions":            Path.home() / ".codex" / "sessions",
-    "Codex archived sessions":   Path.home() / ".codex" / "archived_sessions",
-    "Banco SQLite":              db.DB_PATH,
+    "Claude Code transcripts": Path.home() / ".claude" / "projects",
+    "Codex sessions": Path.home() / ".codex" / "sessions",
+    "Codex archived sessions": Path.home() / ".codex" / "archived_sessions",
+    "Banco SQLite fallback": db.DB_PATH,
 }
 
 for label, path in sources.items():
-    exists = path.exists()
-    icon = "✅" if exists else "❌"
-    st.markdown(f"{icon} **{label}**  \n`{path}`")
+    icon = "OK" if path.exists() else "Nao encontrado"
+    st.markdown(f"**{label}** ({icon})  \n`{path}`")
 
 st.divider()
 
-# ── preços por modelo (informativo) ──────────────────────────────────────────
-st.subheader("Referência de preços (por 1M tokens)")
-st.caption("Usado apenas para estimativa de custo — não afeta a coleta.")
+st.subheader("Referencia de precos (por 1M tokens)")
+st.caption("Usado apenas para estimativa de custo - nao afeta a coleta.")
 
 prices = {
-    "claude-opus-4-8":   {"input": 15.00, "output": 75.00, "cache_read": 1.50},
-    "claude-sonnet-4-6": {"input":  3.00, "output": 15.00, "cache_read": 0.30},
-    "claude-haiku-4-5":  {"input":  0.80, "output":  4.00, "cache_read": 0.08},
-    "gpt-5.5":           {"input": 10.00, "output": 30.00, "cache_read": 2.50},
+    "claude-opus-4-8": {"input": 15.00, "output": 75.00, "cache_read": 1.50},
+    "claude-sonnet-4-6": {"input": 3.00, "output": 15.00, "cache_read": 0.30},
+    "claude-haiku-4-5": {"input": 0.80, "output": 4.00, "cache_read": 0.08},
+    "gpt-5.5": {"input": 10.00, "output": 30.00, "cache_read": 2.50},
 }
 
-import pandas as pd
-df = pd.DataFrame(prices).T.reset_index().rename(columns={"index":"Modelo","input":"Input $","output":"Output $","cache_read":"Cache Read $"})
+df = pd.DataFrame(prices).T.reset_index().rename(
+    columns={
+        "index": "Modelo",
+        "input": "Input $",
+        "output": "Output $",
+        "cache_read": "Cache Read $",
+    }
+)
 st.dataframe(df, use_container_width=True, hide_index=True)
-st.caption("Valores em USD. Atualize diretamente no código `pages/settings.py` se os preços mudarem.")
+st.caption("Valores em USD. Atualize diretamente em `pages/settings.py` se os precos mudarem.")
