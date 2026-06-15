@@ -404,6 +404,80 @@ def ingest_codex_file(con, path: Path):
 
 # ------------------------------------------------------------------- collect
 
+def _check_thresholds(con) -> list[str]:
+    """Return warning strings for threshold violations (runs after collect)."""
+    msgs = []
+    if USE_POSTGRES:
+        ts7  = "CAST(ts AS timestamp) >= now() - (7  * interval '1 day')"
+        ts30 = "CAST(ts AS timestamp) >= now() - (30 * interval '1 day')"
+    else:
+        ts7  = "ts >= datetime('now', '-7 days')"
+        ts30 = "ts >= datetime('now', '-30 days')"
+
+    # 1. Cache hit < 70% (all-time, min 10K total input-side tokens)
+    try:
+        rows = con.execute(
+            "SELECT agent,"
+            " COALESCE(SUM(cache_read_tokens), 0),"
+            " COALESCE(SUM(input_tokens + cache_read_tokens + cache_create_tokens), 0)"
+            " FROM token_usage WHERE agent IS NOT NULL"
+            " GROUP BY agent"
+        ).fetchall()
+        for agent, cr, total in rows:
+            if total >= 10_000 and (cr / total * 100) < 70:
+                msgs.append(f"[CACHE ] {agent}: cache hit {cr/total*100:.0f}% < 70%")
+    except Exception:
+        pass
+
+    # 2. Tokens/invocation spike > 50% vs all-time average (min 3 recent inv)
+    try:
+        r_tok = dict(con.execute(
+            f"SELECT agent, COALESCE(SUM(output_tokens),0)"
+            f" FROM token_usage WHERE agent IS NOT NULL AND {ts7} GROUP BY agent"
+        ).fetchall())
+        r_inv = dict(con.execute(
+            f"SELECT agent, COUNT(*)"
+            f" FROM invocations WHERE agent IS NOT NULL AND {ts7} GROUP BY agent"
+        ).fetchall())
+        h_tok = dict(con.execute(
+            "SELECT agent, COALESCE(SUM(output_tokens),0)"
+            " FROM token_usage WHERE agent IS NOT NULL GROUP BY agent"
+        ).fetchall())
+        h_inv = dict(con.execute(
+            "SELECT agent, COUNT(*)"
+            " FROM invocations WHERE agent IS NOT NULL GROUP BY agent"
+        ).fetchall())
+        for agent, inv_r in r_inv.items():
+            inv_h = h_inv.get(agent, 0)
+            if inv_r < 3 or inv_h < 5:
+                continue
+            avg_r = r_tok.get(agent, 0) / inv_r
+            avg_h = h_tok.get(agent, 0) / inv_h
+            if avg_h > 0 and avg_r > avg_h * 1.5:
+                pct = (avg_r / avg_h - 1) * 100
+                msgs.append(
+                    f"[SPIKE ] {agent}: {avg_r/1000:.1f}K tok/inv (7d)"
+                    f" vs {avg_h/1000:.1f}K histórico (+{pct:.0f}%)"
+                )
+    except Exception:
+        pass
+
+    # 3. Agents inactive for 30 days
+    try:
+        all_ag = {r[0] for r in con.execute(
+            "SELECT DISTINCT agent FROM invocations WHERE agent IS NOT NULL"
+        ).fetchall()}
+        active = {r[0] for r in con.execute(
+            f"SELECT DISTINCT agent FROM invocations WHERE agent IS NOT NULL AND {ts30}"
+        ).fetchall()}
+        for agent in sorted(all_ag - active):
+            msgs.append(f"[INATIVO] {agent}: sem invocações nos últimos 30 dias")
+    except Exception:
+        pass
+
+    return msgs
+
+
 def collect(args):
     con = connect()
     scanned = ingested = 0
@@ -441,6 +515,12 @@ def collect(args):
     print(f"Scanned {scanned} files, ingested/updated {ingested}.")
     print(f"Database: {'neon:' if USE_POSTGRES else 'sqlite:'}{dest}")
     print(f"Machine:  {MACHINE_ID}")
+
+    alerts = _check_thresholds(con)
+    if alerts:
+        print("\n--- Alertas de threshold ---")
+        for msg in alerts:
+            print(msg)
 
 
 # -------------------------------------------------------------------- report

@@ -338,6 +338,55 @@ def fmt(n) -> str:
     return str(n)
 
 
+def threshold_alerts() -> list[dict]:
+    """Return threshold violations for the Settings page.
+
+    Each dict: {type: 'cache'|'spike'|'inactive', agent: str, msg: str}
+    """
+    alerts = []
+
+    # 1. Cache hit < 70% (all-time, min 10K input-side tokens)
+    eff = usage_by_agent()
+    if not eff.empty:
+        for _, r in eff.iterrows():
+            total = (r["input"] or 0) + (r["cache_read"] or 0) + (r.get("cache_create", 0) or 0)
+            if total >= 10_000 and pd.notna(r["cache_hit_pct"]) and r["cache_hit_pct"] < 70:
+                alerts.append({"type": "cache", "agent": r["agent"],
+                                "msg": f"Cache hit {r['cache_hit_pct']:.0f}% (limite: 70%)"})
+
+    # 2. Spike > 50%: tok/inv last 7d vs all-time
+    recent_tok = usage_by_agent(days=7)
+    recent_inv = invocations_by_agent(days=7)
+    all_inv    = invocations_by_agent()
+
+    if not recent_tok.empty and not recent_inv.empty and not all_inv.empty:
+        r_inv = recent_inv.groupby("agent")["invocations"].sum()
+        h_inv = all_inv.groupby("agent")["invocations"].sum()
+        for _, row in recent_tok.iterrows():
+            agent = row["agent"]
+            inv_r = r_inv.get(agent, 0)
+            inv_h = h_inv.get(agent, 0)
+            if inv_r < 3 or inv_h < 5:
+                continue
+            avg_r = row["output"] / inv_r if inv_r else 0
+            h_row = eff[eff["agent"] == agent]
+            avg_h = float(h_row["output"].sum() / inv_h) if not h_row.empty and inv_h else 0
+            if avg_h > 0 and avg_r > avg_h * 1.5:
+                pct = (avg_r / avg_h - 1) * 100
+                alerts.append({"type": "spike", "agent": agent,
+                                "msg": f"{avg_r/1000:.1f}K tok/inv (7d) vs {avg_h/1000:.1f}K histórico (+{pct:.0f}%)"})
+
+    # 3. Inactive 30 days
+    active_30d = set(invocations_by_agent(days=30)["agent"].tolist()) \
+        if not invocations_by_agent(days=30).empty else set()
+    for agent in all_agents():
+        if agent not in active_30d:
+            alerts.append({"type": "inactive", "agent": agent,
+                            "msg": "Sem invocações nos últimos 30 dias"})
+
+    return alerts
+
+
 def cache_badge(pct) -> str:
     if pct is None or str(pct) == "nan":
         return "-"

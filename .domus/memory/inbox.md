@@ -4,78 +4,56 @@ Active task queue for cross-agent work. Agents should read this before `handoffs
 
 ## Open Tasks
 
-### TASK-20260615-002 | status: in_progress | owner: security-reviewer (bartolomeu_security)
+### TASK-20260615-006-IMPL | status: queued | owner: pedro_CTO (aguarda aprovação)
 - Requested by: workstyle-standards-coordinator (pedro_CTO)
 - Platform: Claude Code
-- Summary: Security audit do console Streamlit e coletor com foco em SQL injection, subprocess injection e exposição de DATABASE_URL.
-- Files/areas: console/db.py, scripts/agent-usage.py, console/pages/agent_manager.py
-- Expected output: findings com severidade + fixes aplicados para alta, documentados para média/baixa.
-- Blocker: None
-- Updated: 2026-06-15T15:00:00Z
-
-### TASK-20260615-003 | status: in_progress | owner: code-reviewer (tome_reviewer)
-- Requested by: workstyle-standards-coordinator (pedro_CTO)
-- Platform: Claude Code
-- Summary: Verificar compatibilidade Postgres do DbCompat — fetchone() indexing, params style, transação sem rollback em exceção.
-- Files/areas: scripts/agent-usage.py (DbCompat, file_changed, report, connect)
-- Expected output: findings + fixes aplicados para issues que quebram Postgres.
-- Blocker: None
-- Updated: 2026-06-15T15:00:00Z
-
-### TASK-20260615-004 | status: queued | owner: implementation-planner (tiago_planner)
-- Requested by: workstyle-standards-coordinator (pedro_CTO)
-- Platform: Claude Code
-- Summary: Planejar e implementar custo estimado em USD por invocação no console.
-- Context: console/db.py tem todos os tokens + model por linha de token_usage. A tabela de preços está em console/pages/settings.py. Precisa cruzar os dois e adicionar coluna `estimated_cost_usd` ou calculá-la on-the-fly nas queries.
-- Files/areas: console/db.py, console/pages/dashboard.py, console/pages/agent_detail.py, console/pages/settings.py
-- Expected output: custo em USD visível no dashboard e no detalhe de agent.
-- Blocker: aguardar TASK-20260615-002 e 003 finalizarem para não conflitar em arquivos.
-- Updated: 2026-06-15T15:00:00Z
-
-### TASK-20260615-005 | status: queued | owner: implementation-planner (tiago_planner)
-- Requested by: workstyle-standards-coordinator (pedro_CTO)
-- Platform: Claude Code
-- Summary: Implementar alertas de threshold no coletor (cache hit < 70%, spike de tokens/invocação > 50% vs média histórica, agents inativos há 30 dias).
-- Context: scripts/agent-usage.py já tem a lógica de collect; alertas podem ser warnings no terminal ou gravados numa tabela `alerts` no banco.
-- Files/areas: scripts/agent-usage.py, opcionalmente console/pages/settings.py para configurar thresholds.
-- Expected output: alertas impressos no final do `collect` + visíveis na tela de Configurações.
-- Blocker: aguardar TASK-20260615-002 e 003.
-- Updated: 2026-06-15T15:00:00Z
-
-### TASK-20260615-006 | status: queued | owner: software-architect (joao_arquiteto)
-- Requested by: workstyle-standards-coordinator (pedro_CTO)
-- Platform: Claude Code
-- Summary: Projetar agent versioning — gravar snapshot da spec ao fazer deploy pelo console, correlacionar mudanças de spec com mudanças de eficiência.
-- Context: console/pages/agent_manager.py já tem o pipeline gerar/validar/implantar. Falta registrar o "antes e depois" no banco para análise histórica.
-- Files/areas: console/pages/agent_manager.py, console/db.py, scripts/agent-usage.py (schema)
-- Expected output: design de tabela `agent_versions` + plano de implementação (não implementar ainda).
-- Blocker: None
-- Updated: 2026-06-15T15:00:00Z
+- Summary: Implementar agent versioning conforme design de joao_arquiteto.
+- Context: Design completo em `.domus/memory/handoffs.md` (entrada TASK-006 design). Tabela `agent_versions` (SQLite + Postgres), `record_agent_version()` em db.py, snapshot em run_pipeline(), aba "Histórico de versões" em agent_detail.py. Riscos documentados: R1 (timestamp format), R5 (concorrência Neon), R7 (new_name session_state).
+- Files/areas: scripts/agent-usage.py (schemas + migrations), console/db.py (escrita + versioning), console/pages/agent_manager.py (run_pipeline), console/pages/agent_detail.py (nova aba)
+- Expected output: Deploy via console grava versão; agent_detail mostra histórico e correlação de eficiência.
+- Blocker: Aguarda aprovação do usuário.
+- Updated: 2026-06-15T16:30:00Z
 
 ## Recently Completed
 
+### TASK-20260615-005 | status: done | owner: pedro_CTO
+- Summary: Alertas de threshold no coletor e no console.
+- Result: `_check_thresholds()` em scripts/agent-usage.py (cache hit <70%, spike tok/inv >50%, inactive 30d); `threshold_alerts()` em console/db.py; seção "Alertas de threshold" em console/pages/settings.py.
+- Files: scripts/agent-usage.py, console/db.py, console/pages/settings.py
+- Updated: 2026-06-15T16:30:00Z
+
+### TASK-20260615-006 | status: done (design) | owner: software-architect (joao_arquiteto)
+- Summary: Design de agent versioning entregue.
+- Result: Design completo — tabela agent_versions, record_agent_version(), _diff_summary(), query de correlação (Opção A: vigência por versão), UI spec (4 blocos na aba "Histórico de versões"). Ver handoffs.md para o design completo.
+- Updated: 2026-06-15T16:30:00Z
+
+### TASK-20260615-004 | status: done | owner: pedro_CTO
+- Summary: Custo estimado USD no dashboard e agent_detail.
+- Result: MODEL_PRICES, estimated_cost(), cost_by_agent() em console/db.py; 7 KPIs em dashboard.py (incluindo custo); 7 KPIs em agent_detail.py. Commit: 1753043.
+- Updated: 2026-06-15T16:00:00Z
+
+### TASK-20260615-002 | status: done | owner: security-reviewer (bartolomeu_security)
+- Summary: Security audit — subprocess injection, DATABASE_URL redaction, SQL params.
+- Result: Fixes aplicados em console/db.py (_redact_url), console/pages/settings.py (_sanitize_output), console/pages/agent_manager.py (subprocess path safety).
+- Updated: 2026-06-15T15:00:00Z
+
+### TASK-20260615-003 | status: done | owner: code-reviewer (tome_reviewer)
+- Summary: Compatibilidade Postgres do DbCompat.
+- Result: rollback() adicionado ao DbCompat, try/except por-arquivo em collect(), bug 4a/4b/4c corrigidos.
+- Updated: 2026-06-15T15:00:00Z
+
 ### TASK-20260615-001 | status: done | owner: workstyle-standards-coordinator
-- Requested by: user
-- Platform: Codex
-- Summary: Created Neon project and wired Domus Console localhost integration.
-- Result: Neon project `domus-agents` created; schema applied; console and collector use `DATABASE_URL` when present and SQLite fallback otherwise; Streamlit verified at localhost.
-- Blocker: None
+- Summary: Neon project criado e integrado ao Domus Console.
+- Result: Neon `domus-agents` (muddy-hat-61615284); schema aplicado; console + coletor usam DATABASE_URL com SQLite fallback.
 - Updated: 2026-06-15T14:44:46Z
 
-### TASK-20260615-007 | status: done | owner: workstyle-standards-coordinator (pedro_CTO)
-- Requested by: user
-- Platform: Claude Code
-- Summary: Aplicar machine_id ao coletor e schemas + corrigir print de destino.
-- Result: MACHINE_ID gerado em ~/.domus/machine_id (UUID persistente); adicionado às tabelas invocations e token_usage com DEFAULT 'local'; migrations idempotentes (SQLITE/POSTGRES_MIGRATIONS) aplicadas no connect(); print do collect agora mostra destino real (neon: ou sqlite:) e machine_id.
-- Files: scripts/agent-usage.py
+### TASK-20260615-007 | status: done | owner: pedro_CTO
+- Summary: machine_id no coletor e schemas.
+- Result: UUID gerado em ~/.domus/machine_id; migrations idempotentes; print do collect mostra destino real.
 - Updated: 2026-06-15T15:00:00Z
 
 ### TASK-20260609-001 | status: done | owner: workstyle-standards-coordinator
-- Requested by: user
-- Platform: Codex
-- Summary: Implemented low-token Domus memory stack and updated agents globally.
-- Result: Added `state.md`, `inbox.md`, `archive/`, compact read order, and coordinator-owned stack initialization instructions; regenerated, validated, and globally deployed agents.
-- Blocker: None
+- Summary: Low-token Domus memory stack implementado e agents atualizados globalmente.
 - Updated: 2026-06-09T02:40:48Z
 
 ## Task Format

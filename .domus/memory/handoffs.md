@@ -4,6 +4,20 @@ Append newest entries at the top of the log. Keep entries compact and factual.
 
 ## Log
 
+### 2026-06-15T16:30:00Z | Claude Code | workstyle-standards-coordinator (pedro_CTO)
+- Task: TASK-005 — alertas de threshold no coletor e console
+- Actions: Adicionou `_check_thresholds()` em scripts/agent-usage.py (3 checks: cache hit <70%, spike tok/inv >50%, inactive 30d); `threshold_alerts()` em console/db.py reutilizando helpers existentes; seção "Alertas de threshold" em console/pages/settings.py.
+- Files: scripts/agent-usage.py, console/db.py, console/pages/settings.py
+- Status: done
+- Next: TASK-006-IMPL (implementação de agent versioning) — aguarda aprovação do usuário.
+
+### 2026-06-15T16:00:00Z | Claude Code | software-architect (joao_arquiteto)
+- Task: TASK-006 design — agent versioning
+- Actions: Design completo entregue: tabela `agent_versions` (SQLite + Postgres com UNIQUE(agent,version)), `record_agent_version()` + `_canonical_hash()` + `_exec()` + `version_efficiency()` em db.py, bloco de captura em run_pipeline() com try/except (deploy não quebra se gravar falhar), query de correlação portável SQLite/Postgres (Opção A: vigência por versão usando JOIN com próxima versão), UI spec em 4 blocos na aba "Histórico de versões" de agent_detail.py. Riscos documentados: R1 (ISO-8601 timezone), R3 (hash dedup), R5 (concorrência Neon), R7 (new_name fora do form). Não implementou — design only.
+- Files: nenhum (output textual)
+- Status: design done; implementação pendente (TASK-006-IMPL)
+- Next: pedro_CTO despacha implementação quando aprovado pelo usuário.
+
 ### 2026-06-15T16:00:00Z | platform: Claude Code | agent: tome_reviewer
 
 - Task: Postgres compatibility review of scripts/agent-usage.py — four specific risk areas (file_changed row access, report() placeholder/params, clear_file_rows single-element tuple, transaction safety).

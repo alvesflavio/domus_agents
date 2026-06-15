@@ -117,6 +117,29 @@ for label, path in sources.items():
 
 st.divider()
 
+st.subheader("Alertas de threshold")
+st.caption("Baseado nos dados coletados ate agora.")
+
+try:
+    alerts = db.threshold_alerts()
+except Exception as exc:
+    alerts = []
+    st.error(f"Erro ao calcular alertas: {_sanitize_output(str(exc))}")
+
+_ALERT_ICON = {"cache": "Cache hit baixo", "spike": "Spike de tokens", "inactive": "Agent inativo"}
+
+if not alerts:
+    if db.has_data():
+        st.success("Nenhum alerta de threshold ativo.")
+    else:
+        st.info("Sem dados coletados ainda.")
+else:
+    for a in alerts:
+        label = _ALERT_ICON.get(a["type"], "Alerta")
+        st.warning(f"**{label} — {a['agent']}:** {a['msg']}")
+
+st.divider()
+
 st.subheader("Referencia de precos (por 1M tokens)")
 st.caption("Usado apenas para estimativa de custo - nao afeta a coleta.")
 
