@@ -1,10 +1,12 @@
 """Gestão de agents — criar, editar, validar, implantar."""
+import json
 import sys, subprocess, shutil, copy, re
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import streamlit as st
 import yaml
+import db
 
 ROOT = Path(__file__).parent.parent.parent  # C:\dev\domus_agents
 SPEC = ROOT / "specs" / "agents.yaml"
@@ -47,7 +49,30 @@ def deploy_status(name: str) -> dict:
     }
 
 
-def run_pipeline(label: str):
+_DEPLOY_PLATFORMS = [
+    "claude-project", "claude-user", "codex-agents", "codex-skills", "antigravity"
+]
+
+
+def _diff_summary(old: dict | None, new: dict) -> str:
+    if old is None:
+        return "Versão inicial."
+    changes = []
+    for field in ("specialist_name", "description"):
+        if old.get(field) != new.get(field):
+            changes.append(f"{field} alterado")
+    if old.get("tools") != new.get("tools"):
+        changes.append(f"tools: {old.get('tools')} → {new.get('tools')}")
+    old_secs = [s.get("heading") for s in old.get("sections", [])]
+    new_secs = [s.get("heading") for s in new.get("sections", [])]
+    if old_secs != new_secs:
+        changes.append(f"seções: {len(old_secs)} → {len(new_secs)}")
+    elif old.get("sections") != new.get("sections"):
+        changes.append("corpo de seção(ões) editado")
+    return "; ".join(changes) if changes else "Re-deploy sem mudança de conteúdo."
+
+
+def run_pipeline(label: str, target_agents: list | None = None):
     steps = [
         ("Gerar",    ["python", str(SCRIPTS / "generate-agent-kit.py")]),
         ("Validar",  ["powershell", "-File", str(SCRIPTS / "validate-agent-kit.ps1")]),
@@ -70,6 +95,25 @@ def run_pipeline(label: str):
         log.append(f"✓ {step_label} OK")
         box.code("\n".join(log))
     st.success("Pipeline completo! Reinicie sessões do Claude Code e Codex.")
+
+    # ── gravar snapshot de versão dos agents afetados ──────────────────────
+    try:
+        spec_now = load_spec()
+        by_name = {a.get("name"): a for a in spec_now.get("agents", [])}
+        names = target_agents if target_agents else list(by_name.keys())
+        for name in names:
+            agent_spec = by_name.get(name)
+            if not agent_spec:
+                continue
+            prev = db.latest_version(name)
+            prev_spec = json.loads(prev["spec_snapshot"]) if prev else None
+            diff = _diff_summary(prev_spec, agent_spec)
+            v = db.record_agent_version(name, agent_spec, _DEPLOY_PLATFORMS, diff)
+            if v:
+                st.caption(f"v{v} registrada para {name}.")
+    except Exception as exc:
+        st.warning(f"Deploy OK, mas falha ao registrar versão: {exc}")
+    # ───────────────────────────────────────────────────────────────────────
     return True
 
 
@@ -102,7 +146,7 @@ with tab_list:
                         st.markdown(f"{icon} {dest}")
         st.divider()
         if st.button("▶ Regenerar + Validar + Implantar todos", type="primary"):
-            run_pipeline("full")
+            run_pipeline("full", target_agents=None)
 
 # ──────── TAB: EDITAR ─────────────────────────────────────────────────────────
 with tab_edit:
@@ -144,7 +188,7 @@ with tab_edit:
                 st.info("Clique em 'Implantar' para propagar às plataformas.")
 
         if st.button("▶ Gerar + Validar + Implantar", key=f"deploy_{selected}"):
-            run_pipeline(selected)
+            run_pipeline(selected, target_agents=[selected])
 
 # ──────── TAB: NOVO AGENT ─────────────────────────────────────────────────────
 with tab_new:
@@ -181,6 +225,8 @@ with tab_new:
                 save_spec(spec)
                 st.success(f"Agent '{new_name}' adicionado à spec.")
                 st.info("Clique em 'Implantar' para gerar e propagar.")
+                st.session_state["_last_new_agent"] = new_name
 
     if st.button("▶ Gerar + Validar + Implantar (após criar)", key="deploy_new"):
-        run_pipeline("new")
+        last = st.session_state.get("_last_new_agent")
+        run_pipeline("new", target_agents=[last] if last else None)
