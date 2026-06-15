@@ -14,6 +14,26 @@ DB_PATH = Path.home() / ".domus" / "usage.db"
 load_dotenv(ROOT / ".env.local")
 load_dotenv(ROOT / ".env")
 
+# ── pricing (USD per 1M tokens) ──────────────────────────────────────────────
+MODEL_PRICES = {
+    "claude-opus-4-8":   {"input": 15.00, "output": 75.00, "cache_read": 1.50,  "cache_create": 3.75},
+    "claude-sonnet-4-6": {"input":  3.00, "output": 15.00, "cache_read": 0.30,  "cache_create": 0.375},
+    "claude-haiku-4-5":  {"input":  0.80, "output":  4.00, "cache_read": 0.08,  "cache_create": 0.10},
+    "gpt-5.5":           {"input": 10.00, "output": 30.00, "cache_read": 2.50,  "cache_create": 0.00},
+}
+_DEFAULT_PRICE = {"input": 3.00, "output": 15.00, "cache_read": 0.30, "cache_create": 0.375}
+
+
+def estimated_cost(input_tokens, output_tokens, cache_read, cache_create, model) -> float:
+    """Estimated USD cost for a token bundle. Unknown/NULL model falls back to sonnet pricing."""
+    p = MODEL_PRICES.get(model) or _DEFAULT_PRICE
+    return (
+        (input_tokens  or 0) * p["input"]
+        + (output_tokens or 0) * p["output"]
+        + (cache_read    or 0) * p["cache_read"]
+        + (cache_create  or 0) * p["cache_create"]
+    ) / 1_000_000
+
 
 def _database_url() -> str:
     url = os.getenv("DATABASE_URL", "").strip()
@@ -188,6 +208,33 @@ def usage_by_agent(platform="all", project="all", days=0) -> pd.DataFrame:
     df["total"] = df["input"] + df["cache_read"] + df["cache_create"]
     df["cache_hit_pct"] = (df["cache_read"] / df["total"].replace(0, float("nan")) * 100).round(1)
     return df
+
+
+def cost_by_agent(platform="all", project="all", days=0) -> pd.DataFrame:
+    """Estimated USD cost per agent, computed in Python using per-model pricing."""
+    where, params = _filters(platform, project, days)
+    raw = _df(
+        f"SELECT agent, model,"
+        f" SUM(input_tokens) input, SUM(output_tokens) output,"
+        f" SUM(cache_read_tokens) cache_read, SUM(cache_create_tokens) cache_create,"
+        f" COUNT(*) msgs"
+        f" FROM token_usage WHERE agent IS NOT NULL {where}"
+        f" GROUP BY agent, model",
+        params,
+    )
+    if raw.empty:
+        return pd.DataFrame(columns=["agent", "msgs", "output_tokens", "estimated_cost_usd"])
+    raw["estimated_cost_usd"] = raw.apply(
+        lambda r: estimated_cost(r["input"], r["output"], r["cache_read"], r["cache_create"], r["model"]),
+        axis=1,
+    )
+    return (
+        raw.groupby("agent")
+        .agg(msgs=("msgs", "sum"), output_tokens=("output", "sum"),
+             estimated_cost_usd=("estimated_cost_usd", "sum"))
+        .reset_index()
+        .sort_values("estimated_cost_usd", ascending=False)
+    )
 
 
 def usage_by_project(platform="all", project="all", days=0) -> pd.DataFrame:

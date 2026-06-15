@@ -121,10 +121,8 @@ st.subheader("Referencia de precos (por 1M tokens)")
 st.caption("Usado apenas para estimativa de custo - nao afeta a coleta.")
 
 prices = {
-    "claude-opus-4-8": {"input": 15.00, "output": 75.00, "cache_read": 1.50},
-    "claude-sonnet-4-6": {"input": 3.00, "output": 15.00, "cache_read": 0.30},
-    "claude-haiku-4-5": {"input": 0.80, "output": 4.00, "cache_read": 0.08},
-    "gpt-5.5": {"input": 10.00, "output": 30.00, "cache_read": 2.50},
+    m: {k: v for k, v in p.items() if k != "cache_create"}
+    for m, p in db.MODEL_PRICES.items()
 }
 
 df = pd.DataFrame(prices).T.reset_index().rename(

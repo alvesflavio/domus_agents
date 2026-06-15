@@ -34,9 +34,12 @@ tok_df = db.usage_by_agent(project="all", days=days)
 agent_inv_row = inv_df[inv_df["agent"] == agent]["invocations"].sum() if not inv_df.empty else 0
 agent_tok_row = tok_df[tok_df["agent"] == agent].iloc[0] if not tok_df.empty and (tok_df["agent"] == agent).any() else None
 
+cost_df = db.cost_by_agent(project="all", days=days)
+agent_cost = float(cost_df[cost_df["agent"] == agent]["estimated_cost_usd"].sum()) if not cost_df.empty else 0.0
+
 st.subheader(f"🤖 {agent}")
 
-c1, c2, c3, c4, c5 = st.columns(5)
+c1, c2, c3, c4, c5, c6, c7 = st.columns(7)
 c1.metric("Invocações", int(agent_inv_row))
 if agent_tok_row is not None:
     c2.metric("Tokens output", db.fmt(agent_tok_row["output"]))
@@ -44,6 +47,9 @@ if agent_tok_row is not None:
     c4.metric("Cache hit", f"{agent_tok_row['cache_hit_pct']:.1f}%" if pd.notna(agent_tok_row["cache_hit_pct"]) else "—")
     tok_per_inv = agent_tok_row["output"] / agent_inv_row if agent_inv_row else 0
     c5.metric("Tokens/invocação", db.fmt(tok_per_inv))
+    c6.metric("Custo total (USD est.)", f"${agent_cost:,.2f}")
+    cost_per_inv = agent_cost / agent_inv_row if agent_inv_row else 0.0
+    c7.metric("Custo/invocação (USD)", f"${cost_per_inv:,.4f}")
 
 st.divider()
 

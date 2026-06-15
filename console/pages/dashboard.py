@@ -31,15 +31,18 @@ with st.sidebar:
 
 # ── KPI cards ─────────────────────────────────────────────────────────────────
 kpis = db.kpis(platform, project, days)
+cost_df = db.cost_by_agent(platform, project, days)
+total_cost = float(cost_df["estimated_cost_usd"].sum()) if not cost_df.empty else 0.0
 
-c1, c2, c3, c4, c5, c6 = st.columns(6)
+c1, c2, c3, c4, c5, c6, c7 = st.columns(7)
 for col, label, val in [
-    (c1, "Invocações",      kpis.get("invocations", 0)),
-    (c2, "Tokens output",   db.fmt(kpis.get("output_tokens", 0))),
-    (c3, "Cache hit médio", f"{kpis.get('cache_hit', 0):.1f}%"),
-    (c4, "Tokens input",    db.fmt(kpis.get("input_tokens", 0))),
-    (c5, "Projetos ativos", kpis.get("active_projects", 0)),
-    (c6, "Agents ativos",   kpis.get("active_agents", 0)),
+    (c1, "Invocações",           kpis.get("invocations", 0)),
+    (c2, "Tokens output",        db.fmt(kpis.get("output_tokens", 0))),
+    (c3, "Cache hit médio",      f"{kpis.get('cache_hit', 0):.1f}%"),
+    (c4, "Custo estimado (USD)", f"${total_cost:,.2f}"),
+    (c5, "Tokens input",         db.fmt(kpis.get("input_tokens", 0))),
+    (c6, "Projetos ativos",      kpis.get("active_projects", 0)),
+    (c7, "Agents ativos",        kpis.get("active_agents", 0)),
 ]:
     col.metric(label, val)
 
@@ -104,9 +107,16 @@ if not eff.empty and not inv.empty:
     merged["tok_per_inv"] = (merged["output"] / merged["invocations"].replace(0, float("nan"))).round(0)
     merged["ratio_o_i"] = (merged["output"] / merged["input"].replace(0, float("nan"))).round(2)
 
-    display = merged[["agent","invocations","tok_per_inv","cache_hit_pct","ratio_o_i","output","cache_read"]].copy()
-    display.columns = ["Agent","Invocações","Tok/Inv","Cache Hit %","Ratio O/I","Output","Cache Read"]
+    if not cost_df.empty:
+        merged = merged.merge(cost_df[["agent", "estimated_cost_usd"]], on="agent", how="left")
+    else:
+        merged["estimated_cost_usd"] = 0.0
+    merged["estimated_cost_usd"] = merged["estimated_cost_usd"].fillna(0.0)
+
+    display = merged[["agent","invocations","tok_per_inv","cache_hit_pct","ratio_o_i","output","cache_read","estimated_cost_usd"]].copy()
+    display.columns = ["Agent","Invocações","Tok/Inv","Cache Hit %","Ratio O/I","Output","Cache Read","Custo USD (est.)"]
     display["Output"] = display["Output"].apply(db.fmt)
     display["Cache Read"] = display["Cache Read"].apply(db.fmt)
     display["Cache Hit %"] = display["Cache Hit %"].apply(lambda x: f"{x:.1f}%" if pd.notna(x) else "—")
+    display["Custo USD (est.)"] = display["Custo USD (est.)"].apply(lambda v: f"${v:,.2f}")
     st.dataframe(display, use_container_width=True, hide_index=True)
